@@ -51,11 +51,17 @@ func Connect() {
 
 	log.LogInfo("✅ Conexión a base de datos exitosa", nil)
 
-	if err := db.AutoMigrate(&models.User{}); err != nil {
+	if err := db.AutoMigrate(
+		&models.User{},
+		&models.Team{},
+		&models.Tournament{},
+		&models.Player{},
+		&models.Match{},
+		&models.TournamentTeam{}); err != nil {
 		log.LogError("❌ Error al migrar modelos", map[string]interface{}{
 			"error": err.Error(),
 		})
+	} else {
+		log.LogInfo("✅ Migraciones completadas", nil)
 	}
-
-	log.LogInfo("✅ Migraciones completadas", nil)
 }

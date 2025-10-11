@@ -5,5 +5,6 @@ type User struct {
 	Username string  `gorm:"size:100;not null"`
 	Password string  `gorm:"size:255;not null"`
 	Email    string  `gorm:"size:255;uniqueIndex;not null"`
-	Budget   float32 `gorm:"default:120000000"`
+	Budget   float64 `gorm:"default:120000000"`
+	Team     Team
 }
