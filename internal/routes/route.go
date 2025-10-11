@@ -1,17 +1,22 @@
 package routes
 
 import (
-	"net/http"
-
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/controllers"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(r *gin.Engine) {
-	r.GET("/", indexHandler)
-}
+	// Página principal
+	r.GET("/", controllers.Index)
 
-func indexHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", gin.H{
-		"status": "Ok",
-	})
+	// Register
+	r.GET("/register", controllers.RegisterForm)
+	r.POST("/register", controllers.RegisterUser)
+
+	// Login
+	r.GET("/login", controllers.LoginForm)
+	r.POST("/login", controllers.LoginUser)
+
+	// Perfil (requiere autenticación)
+	r.GET("/profile", controllers.Profile)
 }

@@ -7,4 +7,5 @@ type User struct {
 	Email    string  `gorm:"size:255;uniqueIndex;not null"`
 	Budget   float64 `gorm:"default:120000000"`
 	Team     Team
+	Role     string `gorm:"type:enum('USER','ADMIN');default:'USER'"`
 }
