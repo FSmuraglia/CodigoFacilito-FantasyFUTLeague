@@ -64,4 +64,5 @@ func Connect() {
 	} else {
 		log.LogInfo("✅ Migraciones completadas", nil)
 	}
+	DB = db
 }

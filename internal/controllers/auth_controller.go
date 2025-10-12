@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func Index(c *gin.Context) {
@@ -28,7 +29,7 @@ func RegisterForm(c *gin.Context) {
 func RegisterUser(c *gin.Context) {
 	var input struct {
 		Username string `form:"username" binding:"required"`
-		Email    string `form:"email" binding:"required, email"`
+		Email    string `form:"email" binding:"required,email"`
 		Password string `form:"password" binding:"required"`
 	}
 
@@ -87,7 +88,7 @@ func LoginForm(c *gin.Context) {
 
 func LoginUser(c *gin.Context) {
 	var input struct {
-		Email    string `form:"email" binding:"required, email"`
+		Email    string `form:"email" binding:"required,email"`
 		Password string `form:"password" binding:"required"`
 	}
 
@@ -146,12 +147,51 @@ func LoginUser(c *gin.Context) {
 		"email":  user.Email,
 	})
 
-	c.Redirect(http.StatusSeeOther, "/index")
+	c.Redirect(http.StatusSeeOther, "/")
 }
 
 func Profile(c *gin.Context) {
-	log.LogInfo("🔍 Acceso a perfil de usuario", nil)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		log.LogError("❌ Intento no autorizado de acceso a /profile", map[string]interface{}{
+			"status": http.StatusUnauthorized,
+		})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "Usuario no autenticado",
+		})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.LogWarn("⚠️ Usuario no encontrado", map[string]interface{}{
+				"status": http.StatusNotFound,
+				"id":     userID,
+				"error":  err.Error(),
+			})
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"error": "Usuario no encontrado",
+			})
+		} else {
+			log.LogError("❌ Error al buscar usuario en Profile()", map[string]interface{}{
+				"status": http.StatusInternalServerError,
+				"error":  err.Error(),
+			})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": "Error interno del servidor",
+			})
+		}
+		return
+	}
+
+	log.LogInfo("✅ Perfil accedido por usuario", map[string]interface{}{
+		"id":     userID,
+		"status": http.StatusOK,
+	})
+
 	c.HTML(http.StatusOK, "profile.html", gin.H{
-		"user": "info",
+		"Name":  user.Username,
+		"Email": user.Email,
 	})
 }
