@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/controllers"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,5 +19,18 @@ func RegisterRoutes(r *gin.Engine) {
 	r.POST("/login", controllers.LoginUser)
 
 	// Perfil (requiere autenticación)
-	r.GET("/profile", controllers.Profile)
+	protected := r.Group("/")
+	protected.Use(middlewares.AuthRequired())
+	{
+		protected.GET("/profile", controllers.Profile)
+	}
+
+	// Rutas Solo ADMIN
+	/*
+		admin := r.Group("/admin")
+		admin.Use(middlewares.AuthRequired(), middlewares.AdminOnly())
+		{
+			admin.POST("/tournaments", controllers.CreateTournament)
+		}
+	*/
 }
