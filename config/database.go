@@ -6,7 +6,6 @@ import (
 
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/models"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -14,12 +13,6 @@ import (
 var DB *gorm.DB
 
 func GetConnection() (*gorm.DB, error) {
-	err := godotenv.Load()
-
-	if err != nil {
-		log.LogWarn("⚠️ No se encontró archivo .env, usando variables del sistema", nil)
-	}
-
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"),
