@@ -22,7 +22,7 @@ func Index(c *gin.Context) {
 }
 
 func RegisterForm(c *gin.Context) {
-	log.LogInfo("🔍 Acceso a formulario de registro", nil)
+	log.LogInfo("📝 Acceso a formulario de registro", nil)
 	c.HTML(http.StatusOK, "register.html", nil)
 }
 
@@ -82,7 +82,7 @@ func RegisterUser(c *gin.Context) {
 }
 
 func LoginForm(c *gin.Context) {
-	log.LogInfo("🔍 Acceso a formulario de Login", nil)
+	log.LogInfo("📝 Acceso a formulario de Login", nil)
 	c.HTML(http.StatusOK, "login.html", nil)
 }
 

@@ -9,7 +9,7 @@ type Tournament struct {
 	Prize     float64
 	StartDate time.Time `gorm:"type:date;not null"`
 	EndDate   time.Time `gorm:"type:date"`
-	WinnerID  uint
+	WinnerID  *uint
 	Winner    Team    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Matches   []Match `gorm:"foreignKey:TournamentID"`
 }

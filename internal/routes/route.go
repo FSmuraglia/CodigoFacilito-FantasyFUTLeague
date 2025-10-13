@@ -28,12 +28,10 @@ func RegisterRoutes(r *gin.Engine) {
 		protected.GET("/profile", controllers.Profile)
 	}
 
-	// Rutas Solo ADMIN
-	/*
-		admin := r.Group("/admin")
-		admin.Use(middlewares.AuthRequired(), middlewares.AdminOnly())
-		{
-			admin.POST("/tournaments", controllers.CreateTournament)
-		}
-	*/
+	adminTournament := r.Group("/tournaments")
+	adminTournament.Use(middlewares.AuthRequired(), middlewares.AdminOnly())
+	{
+		adminTournament.GET("/create", controllers.CreateTournamentForm)
+		adminTournament.POST("/create", controllers.CreateTournament)
+	}
 }
