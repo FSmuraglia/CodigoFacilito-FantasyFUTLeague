@@ -150,6 +150,12 @@ func LoginUser(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
+func LogoutUser(c *gin.Context) {
+	c.SetCookie("jwt", "", -1, "/", "", false, true)
+	log.LogInfo("👋 Usuario deslogueado correctamente", nil)
+	c.Redirect(http.StatusSeeOther, "/login")
+}
+
 func Profile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {

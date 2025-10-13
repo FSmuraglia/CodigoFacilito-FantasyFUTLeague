@@ -18,6 +18,9 @@ func RegisterRoutes(r *gin.Engine) {
 	r.GET("/login", controllers.LoginForm)
 	r.POST("/login", controllers.LoginUser)
 
+	//Logout
+	r.GET("/logout", controllers.LogoutUser)
+
 	// Perfil (requiere autenticación)
 	protected := r.Group("/")
 	protected.Use(middlewares.AuthRequired())
