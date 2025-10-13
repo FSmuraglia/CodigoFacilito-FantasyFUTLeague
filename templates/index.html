@@ -3,9 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <title>Document</title>
 </head>
 <body>
-    Hola
+    <nav class="navbar navbar-expand-lg navbar-dark px-4">
+    <a class="navbar-brand fw-bold" href="/">FantasyFUT League</a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/tournaments">Torneos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/teams">Equipos</a>
+        </li>
+      </ul>
+
+      <!-- 🔹 Enlaces según sesión -->
+      <ul class="navbar-nav ms-auto">
+        {{ if .IsLoggedIn }}
+          <li class="nav-item">
+              <a class="nav-link text-danger" href="/logout">Cerrar sesión</a>
+            </li>
+        {{ else }}
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Iniciar sesión</a>
+          </li>
+        {{ end }}
+      </ul>
+    </div>
+  </nav>
+    <h2>Hola</h2>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

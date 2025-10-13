@@ -20,6 +20,8 @@ func main() {
 
 	r := gin.Default()
 
+	r.Static("/static", "./static")
+
 	r.LoadHTMLGlob("templates/*")
 
 	routes.RegisterRoutes(r)

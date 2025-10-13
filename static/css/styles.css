@@ -1,27 +1,35 @@
+/* ===== Estilo general ===== */
 body {
-    background-color: #121212;
-    color: #f5f5f5;
+    background-color: #ffffff; /* Fondo blanco */
+    color: #1a1a1a; /* Texto gris oscuro para buena lectura */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* ===== Navbar ===== */
 nav.navbar {
-    background-color: #000;
+    background-color: #0d6efd; /* Azul principal */
 }
 
-a.nav-link, a.navbar-brand {
-    color: #f5f5f5 !important;
+a.nav-link, 
+a.navbar-brand {
+    color: #ffffff !important;
+    font-weight: 500;
 }
 
-a.nav-link:hover, a.navbar-brand:hover {
-    color: #0d6efd !important;
+a.nav-link:hover, 
+a.navbar-brand:hover {
+    color: #dbe8ff !important; /* Azul muy claro al pasar el mouse */
 }
 
+/* ===== Tarjetas ===== */
 .card {
-    background-color: #1e1e1e;
-    color: #f5f5f5;
-    border: none;
+    background-color: #f8f9fa; /* Gris claro */
+    color: #212529; /* Texto casi negro */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
 }
 
+/* ===== Botones ===== */
 .btn-primary {
     background-color: #0d6efd;
     border: none;
@@ -29,4 +37,35 @@ a.nav-link:hover, a.navbar-brand:hover {
 
 .btn-primary:hover {
     background-color: #0b5ed7;
+}
+
+/* ===== Formularios ===== */
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+}
+
+/* ===== Enlaces ===== */
+a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #0b5ed7;
+    text-decoration: underline;
+}
+
+/* ===== Utilidades ===== */
+.text-center {
+    text-align: center;
+}
+
+.container {
+    margin-top: 2rem;
 }

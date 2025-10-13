@@ -4,14 +4,34 @@
   <meta charset="UTF-8">
   <title>Perfil - FantasyFUTLeague</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
 </head>
-<body class="bg-light">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="/">FantasyFUTLeague</a>
-      <div class="d-flex">
-        <a href="/logout" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
-      </div>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark px-4">
+    <a class="navbar-brand fw-bold" href="/">FantasyFUT League</a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/tournaments">Torneos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/teams">Equipos</a>
+        </li>
+      </ul>
+
+      <!-- 🔹 Enlaces según sesión -->
+      <ul class="navbar-nav ms-auto">
+        {{ if .IsLoggedIn }}
+          <li class="nav-item">
+              <a class="nav-link text-danger" href="/logout">Cerrar sesión</a>
+            </li>
+        {{ else }}
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Iniciar sesión</a>
+          </li>
+        {{ end }}
+      </ul>
     </div>
   </nav>
 
