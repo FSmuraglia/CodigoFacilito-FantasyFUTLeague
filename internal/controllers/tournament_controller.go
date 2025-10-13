@@ -7,12 +7,13 @@ import (
 	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/models"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func CreateTournamentForm(c *gin.Context) {
 	log.LogInfo("📝 Acceso a formulario de registro de torneo", nil)
-	c.HTML(http.StatusOK, "create_tournament.html", nil)
+	utils.RenderTemplate(c, http.StatusOK, "create_tournament.html", nil)
 }
 
 func CreateTournament(c *gin.Context) {

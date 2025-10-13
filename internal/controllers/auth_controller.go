@@ -8,6 +8,7 @@ import (
 	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/models"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -23,7 +24,7 @@ func Index(c *gin.Context) {
 
 func RegisterForm(c *gin.Context) {
 	log.LogInfo("📝 Acceso a formulario de registro", nil)
-	c.HTML(http.StatusOK, "register.html", nil)
+	utils.RenderTemplate(c, http.StatusOK, "register.html", nil)
 }
 
 func RegisterUser(c *gin.Context) {
@@ -83,7 +84,7 @@ func RegisterUser(c *gin.Context) {
 
 func LoginForm(c *gin.Context) {
 	log.LogInfo("📝 Acceso a formulario de Login", nil)
-	c.HTML(http.StatusOK, "login.html", nil)
+	utils.RenderTemplate(c, http.StatusOK, "login.html", nil)
 }
 
 func LoginUser(c *gin.Context) {
@@ -196,7 +197,7 @@ func Profile(c *gin.Context) {
 		"status": http.StatusOK,
 	})
 
-	c.HTML(http.StatusOK, "profile.html", gin.H{
+	utils.RenderTemplate(c, http.StatusOK, "profile.html", gin.H{
 		"Name":  user.Username,
 		"Email": user.Email,
 	})
