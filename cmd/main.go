@@ -2,8 +2,11 @@ package main
 
 import (
 	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/controllers"
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/repositories"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/routes"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -17,6 +20,11 @@ func main() {
 	}
 
 	database.Connect()
+
+	// Inicialización de repositorios y services
+	tournamentsRepository := repositories.NewTournamentRepository()
+	service := services.NewTournamentService(tournamentsRepository)
+	controllers.InitTournamentController(service)
 
 	r := gin.Default()
 

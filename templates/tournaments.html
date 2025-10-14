@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneos - FantasyFUTLeague</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark px-4">
+        <a class="navbar-brand fw-bold" href="/">FantasyFUT League</a>
+
+        <div class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+            <a class="nav-link" href="/tournaments">Torneos</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="/teams">Equipos</a>
+            </li>
+        </ul>
+
+        <!-- Enlaces según sesión -->
+        <ul class="navbar-nav ms-auto">
+            {{ if .IsLoggedIn }}
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="/logout">Cerrar sesión</a>
+                </li>
+            {{ else }}
+            <li class="nav-item">
+                <a class="nav-link" href="/login">Iniciar sesión</a>
+            </li>
+            {{ end }}
+        </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h2 class="text-white mb-4">Lista de Torneos</h2>
+
+        <!-- Filtros -->
+        <form method="get" class="d-flex flex-wrap align-items-center mb-3">
+            <input
+            type="text"
+            name="name"
+            class="form-control me-2 mb-2"
+            placeholder="Buscar por nombre"
+            value="{{ .NameFilter }}"
+            style="max-width: 250px;"
+            />
+
+            <select name="sort" class="form-select me-2 mb-2" style="max-width: 250px;">
+            <option value="">Ordenar por...</option>
+            <option value="prize_desc" {{if eq .SortParam "prize_desc"}}selected{{end}}>Premio (Mayor a Menor)</option>
+            <option value="prize_asc" {{if eq .SortParam "prize_asc"}}selected{{end}}>Premio (Menor a Mayor)</option>
+            <option value="date_asc" {{if eq .SortParam "date_asc"}}selected{{end}}>Fecha (Más próxima primero)</option>
+            <option value="date_desc" {{if eq .SortParam "date_desc"}}selected{{end}}>Fecha (Más lejana primero)</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
+        </form>
+
+        <!-- Lista de torneos -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle border rounded shadow-sm">
+                <thead class="table-primary">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Premio</th>
+                    <th>Fecha de Inicio</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ range .tournaments }}
+                <tr>
+                    <td class="fw-semibold">{{ .Name }}</td>
+                    <td>${{ printf "%.2f" .Prize }}</td>
+                    <td>{{ .StartDate.Format "02/01/2006" }}</td>
+                </tr>
+                {{ else }}
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-3">
+                    No hay torneos disponibles
+                    </td>
+                </tr>
+                {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

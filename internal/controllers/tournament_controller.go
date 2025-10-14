@@ -2,14 +2,22 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/models"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/services"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
+
+var tournamentService *services.TournamentService
+
+func InitTournamentController(s *services.TournamentService) {
+	tournamentService = s
+}
 
 func CreateTournamentForm(c *gin.Context) {
 	log.LogInfo("📝 Acceso a formulario de registro de torneo", nil)
@@ -84,4 +92,31 @@ func CreateTournament(c *gin.Context) {
 	})
 
 	c.Redirect(http.StatusSeeOther, "/tournaments")
+}
+
+func ListTournaments(c *gin.Context) {
+	nameFilter := strings.TrimSpace(c.Query("name"))
+	sortParam := c.Query("sort")
+
+	tournaments, err := tournamentService.ListTournaments(nameFilter, sortParam)
+	if err != nil {
+		log.LogError("❌ Error al obtener los torneos de la DB", map[string]interface{}{
+			"status": http.StatusInternalServerError,
+			"error":  err.Error(),
+		})
+		c.HTML(http.StatusInternalServerError, "tournaments.html", gin.H{
+			"error": "Error al obtener los torneos de la DB",
+		})
+		return
+	}
+
+	log.LogInfo("✅ Torneos obtenidos correctamente de la DB", map[string]interface{}{
+		"count":  len(tournaments),
+		"status": http.StatusOK,
+	})
+	utils.RenderTemplate(c, http.StatusOK, "tournaments.html", gin.H{
+		"tournaments": tournaments,
+		"NameFilter":  nameFilter,
+		"SortParam":   sortParam,
+	})
 }

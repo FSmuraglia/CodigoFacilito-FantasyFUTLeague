@@ -69,3 +69,7 @@ a:hover {
 .container {
     margin-top: 2rem;
 }
+
+.table-primary {
+  background-color: #e7f1ff !important;
+}
