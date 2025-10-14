@@ -18,3 +18,7 @@ type Team struct {
 	WonTournaments []Tournament `gorm:"foreignKey:WinnerID"`
 	Formation      Formation    `gorm:"type:varchar(10);not null"`
 }
+
+func GetAvailableFormations() []Formation {
+	return []Formation{Formation433, Formation4231, Formation442}
+}

@@ -26,6 +26,8 @@ func RegisterRoutes(r *gin.Engine) {
 	protected.Use(middlewares.AuthRequired())
 	{
 		protected.GET("/profile", controllers.Profile)
+		protected.GET("/teams/create", controllers.CreateTeamForm)
+		protected.POST("/teams/create", controllers.CreateTeam)
 	}
 
 	adminTournament := r.Group("/tournaments")
