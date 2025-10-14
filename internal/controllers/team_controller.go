@@ -3,14 +3,22 @@ package controllers
 import (
 	"net/http"
 	"path/filepath"
+	"strings"
 	"time"
 
 	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/models"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/services"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
+
+var teamService *services.TeamService
+
+func InitTeamController(s *services.TeamService) {
+	teamService = s
+}
 
 func CreateTeamForm(c *gin.Context) {
 	log.LogInfo("📝 Acceso a formulario de registro de equipo", nil)
@@ -64,7 +72,7 @@ func CreateTeam(c *gin.Context) {
 	team := models.Team{
 		Name:      name,
 		Formation: models.Formation(formation),
-		BadgeUrl:  "/static/uploads" + filename,
+		BadgeUrl:  "/static/uploads/" + filename,
 		UserID:    userID,
 	}
 
@@ -88,4 +96,32 @@ func CreateTeam(c *gin.Context) {
 
 	c.Redirect(http.StatusSeeOther, "/")
 
+}
+
+func ListTeams(c *gin.Context) {
+	nameFilter := strings.TrimSpace(c.Query("name"))
+	formationFilter := c.Query("formation")
+
+	teams, err := teamService.ListTeams(nameFilter, formationFilter)
+	if err != nil {
+		log.LogError("❌ Error al obtener los equipos de la DB", map[string]interface{}{
+			"status": http.StatusInternalServerError,
+			"error":  err.Error(),
+		})
+		c.HTML(http.StatusInternalServerError, "teams.html", gin.H{
+			"error": "Error al obtener los equipos de la DB",
+		})
+		return
+	}
+
+	log.LogInfo("✅ Equipos obtenidos correctamente de la DB", map[string]interface{}{
+		"count":  len(teams),
+		"status": http.StatusOK,
+	})
+	utils.RenderTemplate(c, http.StatusOK, "teams.html", gin.H{
+		"teams":           teams,
+		"NameFilter":      nameFilter,
+		"FormationFilter": formationFilter,
+		"Formations":      models.GetAvailableFormations(),
+	})
 }

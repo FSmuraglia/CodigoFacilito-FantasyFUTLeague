@@ -12,6 +12,7 @@ type Team struct {
 	ID             uint   `gorm:"primarykey"`
 	Name           string `gorm:"size:100;not null"`
 	UserID         uint
+	User           User     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	BadgeUrl       string   `gorm:"size:255"`
 	Players        []Player `gorm:"foreignKey:TeamID"`
 	Tournaments    []TournamentTeam

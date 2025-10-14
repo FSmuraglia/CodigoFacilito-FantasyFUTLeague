@@ -23,8 +23,12 @@ func main() {
 
 	// Inicialización de repositorios y services
 	tournamentsRepository := repositories.NewTournamentRepository()
-	service := services.NewTournamentService(tournamentsRepository)
-	controllers.InitTournamentController(service)
+	tournamentService := services.NewTournamentService(tournamentsRepository)
+	controllers.InitTournamentController(tournamentService)
+
+	teamRepository := repositories.NewTeamRepository()
+	teamService := services.NewTeamService(teamRepository)
+	controllers.InitTeamController(teamService)
 
 	r := gin.Default()
 
