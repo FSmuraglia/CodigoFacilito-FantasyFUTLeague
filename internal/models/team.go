@@ -23,3 +23,11 @@ type Team struct {
 func GetAvailableFormations() []Formation {
 	return []Formation{Formation433, Formation4231, Formation442}
 }
+
+func (t *Team) CalculateRating() float64 {
+	var total float64
+	for _, player := range t.Players {
+		total += player.Rating
+	}
+	return total / float64(len(t.Players))
+}

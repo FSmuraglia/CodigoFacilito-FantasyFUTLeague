@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math/rand"
+	"time"
+
 	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/controllers"
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
@@ -12,6 +15,8 @@ import (
 )
 
 func main() {
+
+	rand.Seed(time.Now().UnixNano())
 
 	err := godotenv.Load()
 

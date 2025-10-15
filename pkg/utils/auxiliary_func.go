@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math/rand"
 	"os"
 
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
@@ -53,4 +54,14 @@ func GetUserIDFromJWT(c *gin.Context) (uint, bool) {
 
 	return uint(idFloat), true
 
+}
+
+func SimulateMatch(teamARating, teamBRating float64) string {
+	probTeamA := teamARating / (teamARating + teamBRating)
+	random := rand.Float64()
+
+	if random < probTeamA {
+		return "A"
+	}
+	return "B"
 }
