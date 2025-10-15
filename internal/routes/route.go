@@ -21,20 +21,23 @@ func RegisterRoutes(r *gin.Engine) {
 	//Logout
 	r.GET("/logout", controllers.LogoutUser)
 
-	// Perfil (requiere autenticación)
-	protected := r.Group("/")
-	protected.Use(middlewares.AuthRequired())
+	// Rutas que necesitan estar autenticado
+	authOnly := r.Group("/")
+	authOnly.Use(middlewares.AuthRequired())
 	{
-		protected.GET("/profile", controllers.Profile)
-		protected.GET("/teams/create", controllers.CreateTeamForm)
-		protected.POST("/teams/create", controllers.CreateTeam)
+		authOnly.GET("/profile", controllers.Profile)
+		authOnly.GET("/teams/create", controllers.CreateTeamForm)
+		authOnly.POST("/teams/create", controllers.CreateTeam)
 	}
 
-	adminTournament := r.Group("/tournaments")
-	adminTournament.Use(middlewares.AuthRequired(), middlewares.AdminOnly())
+	// Rutas solo ADMIN
+	adminOnly := r.Group("/")
+	adminOnly.Use(middlewares.AuthRequired(), middlewares.AdminOnly())
 	{
-		adminTournament.GET("/create", controllers.CreateTournamentForm)
-		adminTournament.POST("/create", controllers.CreateTournament)
+		adminOnly.GET("/tournaments/create", controllers.CreateTournamentForm)
+		adminOnly.POST("/tournaments/create", controllers.CreateTournament)
+		adminOnly.GET("/players/create", controllers.CreatePlayerForm)
+		adminOnly.POST("/players/create", controllers.CreatePlayer)
 	}
 
 	// Listado de torneos

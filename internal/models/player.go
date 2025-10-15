@@ -28,3 +28,20 @@ type Player struct {
 	PhotoUrl    string   `gorm:"size:255"`
 	Position    Position `gorm:"type:varchar(50);not null"`
 }
+
+func GetAvailablePositions() []Position {
+	return []Position{
+		PositionArquero,
+		PositionLateralDerecho,
+		PositionDefensorCentral,
+		PositionLateralIzquierdo,
+		PositionMediocampistaDefensivo,
+		PositionMediocampistaCentral,
+		PositionMediocampistaOfensivo,
+		PositionMediocampistaDerecho,
+		PositionMediocampistaIzquierdo,
+		PositionExtremoIzquierdo,
+		PositionExtremoDerecho,
+		PositionDelanteroCentro,
+	}
+}
