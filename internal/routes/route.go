@@ -46,4 +46,7 @@ func RegisterRoutes(r *gin.Engine) {
 	// Listado de equipos
 	r.GET("/teams", controllers.ListTeams)
 
+	// Listado de jugadores
+	r.GET("/players", controllers.ListPlayers)
+
 }

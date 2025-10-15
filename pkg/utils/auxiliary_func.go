@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 
@@ -64,4 +65,18 @@ func SimulateMatch(teamARating, teamBRating float64) string {
 		return "A"
 	}
 	return "B"
+}
+
+func FormatNumber(n int64) string {
+	s := fmt.Sprintf("%d", n)
+	formatted := ""
+	count := 0
+	for i := len(s) - 1; i >= 0; i-- {
+		formatted = string(s[i]) + formatted
+		count++
+		if count%3 == 0 && i != 0 {
+			formatted = "." + formatted
+		}
+	}
+	return formatted
 }

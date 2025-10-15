@@ -110,12 +110,26 @@ func ListTournaments(c *gin.Context) {
 		return
 	}
 
+	type TournamentWithFormattedPrize struct {
+		models.Tournament
+		FormattedPrize string
+	}
+
+	var tournamentsFormatted []TournamentWithFormattedPrize
+	for _, t := range tournaments {
+		formatted := utils.FormatNumber(int64(t.Prize))
+		tournamentsFormatted = append(tournamentsFormatted, TournamentWithFormattedPrize{
+			Tournament:     t,
+			FormattedPrize: formatted,
+		})
+	}
+
 	log.LogInfo("✅ Torneos obtenidos correctamente de la DB", map[string]interface{}{
 		"count":  len(tournaments),
 		"status": http.StatusOK,
 	})
 	utils.RenderTemplate(c, http.StatusOK, "tournaments.html", gin.H{
-		"tournaments": tournaments,
+		"tournaments": tournamentsFormatted,
 		"NameFilter":  nameFilter,
 		"SortParam":   sortParam,
 	})
