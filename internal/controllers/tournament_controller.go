@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -180,10 +182,72 @@ func GetTournamentDetail(c *gin.Context) {
 		isAdmin = true
 	}
 
+	var teamCount int64
+	database.DB.Model(&models.TournamentTeam{}).Where("tournament_id = ?", tournament.ID).Count(&teamCount)
+
+	isFull := int(teamCount) >= tournament.TeamAmount
+
 	utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
 		"tournament":   tournamentFormatted,
 		"isRegistered": isRegistered,
 		"isAdmin":      isAdmin,
+		"isFull":       isFull,
 	})
+
+}
+
+func JoinTournament(c *gin.Context) {
+
+	userID, _ := utils.GetUserRoleFromCookie(c)
+
+	tournamentIDParam := c.Param("id")
+	tournamentID, err := strconv.ParseUint(tournamentIDParam, 10, 64)
+	if err != nil {
+		log.LogError("❌ ID de torneo inválido", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusBadRequest,
+		})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "ID de torneo inválido",
+		})
+		return
+	}
+
+	var team models.Team
+	if err := database.DB.Where("user_id = ?", userID).First(&team).Error; err != nil {
+		log.LogWarn("⚠️ El usuario no tiene un equipo creado", map[string]interface{}{
+			"error":   err.Error(),
+			"user_id": userID,
+			"status":  http.StatusBadRequest,
+		})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Debes crear un equipo antes de inscribirte a un torneo",
+		})
+		return
+	}
+
+	newRelation := models.TournamentTeam{
+		TournamentID: uint(tournamentID),
+		TeamID:       team.ID,
+	}
+
+	if err := database.DB.Create(&newRelation).Error; err != nil {
+		log.LogError("❌ Error al inscribir equipo en torneo", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusInternalServerError,
+		})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Error interno al inscribir al equipo",
+		})
+		return
+	}
+
+	log.LogInfo("✅ Equipo inscripto correctamente en el torneo", map[string]interface{}{
+		"tournament_id": tournamentID,
+		"team_id":       team.ID,
+		"user_id":       userID,
+	})
+
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/tournaments/%d", tournamentID))
 
 }

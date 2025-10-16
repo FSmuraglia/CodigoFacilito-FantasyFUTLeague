@@ -128,3 +128,45 @@ func GetUserRoleFromCookie(c *gin.Context) (string, bool) {
 
 	return "", false
 }
+
+func GetFormationRequirements(formation string) map[string]int {
+	switch formation {
+	case "433":
+		return map[string]int{
+			"Arquero":                 1,
+			"Lateral Derecho":         1,
+			"Defensor Central":        2,
+			"Lateral Izquierdo":       1,
+			"Mediocampista Defensivo": 1,
+			"Mediocampista Central":   2,
+			"Extremo Izquierdo":       1,
+			"Extremo Derecho":         1,
+			"Delantero Centro":        1,
+		}
+	case "442":
+		return map[string]int{
+			"Arquero":                     1,
+			"Lateral Derecho":             1,
+			"Defensor Central":            2,
+			"Lateral Izquierdo":           1,
+			"Mediocampista Central":       2,
+			"Mediocampista Por Derecha":   1,
+			"Mediocampista Por Izquierda": 1,
+			"Delantero Centro":            2,
+		}
+	case "4231":
+		return map[string]int{
+			"Arquero":                 1,
+			"Lateral Derecho":         1,
+			"Defensor Central":        2,
+			"Lateral Izquierdo":       1,
+			"Mediocampista Defensivo": 2,
+			"Mediocampista Ofensivo":  1,
+			"Extremo Izquierdo":       1,
+			"Extremo Derecho":         1,
+			"Delantero Centro":        1,
+		}
+	default:
+		return map[string]int{}
+	}
+}

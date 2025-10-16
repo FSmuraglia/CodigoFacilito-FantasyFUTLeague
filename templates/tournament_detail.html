@@ -118,15 +118,36 @@
     </div>
 
     <!-- Botones -->
-    <div class="text-center mt-4">
-      {{ if and .isLoggedIn (not .isRegistered) (not .isAdmin) }}
-        <form method="POST" action="/tournaments/{{ .tournament.ID }}/join">
-          <button class="btn btn-primary">Inscribirse al Torneo</button>
-        </form>
-      {{ else if .isAdmin }}
-        <a href="/tournaments/{{ .tournament.ID }}/edit" class="btn btn-warning">Modificar Torneo</a>
-      {{ end }}
+<div class="text-center mt-4">
+  {{ if .isAdmin }}
+    <!-- El botón de admin no se toca -->
+    <a href="/tournaments/{{ .tournament.ID }}/edit" class="btn btn-warning">Modificar Torneo</a>
+
+  {{ else if .isFull }}
+    <!-- Torneo lleno -->
+    <div class="alert alert-secondary" role="alert">
+      🏆 Torneo completo, no se admiten más inscripciones.
     </div>
+
+  {{ else if .isRegistered }}
+    <!-- Usuario ya inscripto -->
+    <div class="alert alert-info" role="alert">
+      ✅ Ya estás inscripto a este torneo.
+    </div>
+
+  {{ else if .IsLoggedIn }}
+    <!-- Usuario logueado, puede inscribirse -->
+    <form method="POST" action="/tournaments/{{ .tournament.ID }}/join">
+      <button class="btn btn-primary">Inscribirse al Torneo</button>
+    </form>
+
+  {{ else }}
+    <!-- Usuario no autenticado -->
+    <div class="alert alert-warning" role="alert">
+      🔒 Iniciá sesión para inscribirte al torneo.
+    </div>
+  {{ end }}
+</div>
   </div>
 </body>
 </html>
