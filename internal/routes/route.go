@@ -28,6 +28,7 @@ func RegisterRoutes(r *gin.Engine) {
 		authOnly.GET("/profile", controllers.Profile)
 		authOnly.GET("/teams/create", controllers.CreateTeamForm)
 		authOnly.POST("/teams/create", controllers.CreateTeam)
+		authOnly.GET("/tournaments/:id", controllers.GetTournamentDetail)
 	}
 
 	// Rutas solo ADMIN

@@ -15,6 +15,11 @@ import (
 
 var tournamentService *services.TournamentService
 
+type TournamentWithFormattedPrize struct {
+	models.Tournament
+	FormattedPrize string
+}
+
 func InitTournamentController(s *services.TournamentService) {
 	tournamentService = s
 }
@@ -112,11 +117,6 @@ func ListTournaments(c *gin.Context) {
 		return
 	}
 
-	type TournamentWithFormattedPrize struct {
-		models.Tournament
-		FormattedPrize string
-	}
-
 	var tournamentsFormatted []TournamentWithFormattedPrize
 	for _, t := range tournaments {
 		formatted := utils.FormatNumber(int64(t.Prize))
@@ -135,4 +135,55 @@ func ListTournaments(c *gin.Context) {
 		"NameFilter":  nameFilter,
 		"SortParam":   sortParam,
 	})
+}
+
+func GetTournamentDetail(c *gin.Context) {
+	id := c.Param("id")
+	var tournament models.Tournament
+
+	if err := database.DB.
+		Preload("Teams.Team").
+		Preload("Winner").
+		First(&tournament, id).Error; err != nil {
+		log.LogError("❌ Torneo no encontrado", map[string]interface{}{
+			"error":  err.Error(),
+			"id":     id,
+			"status": http.StatusNotFound,
+		})
+		c.HTML(http.StatusNotFound, "tournament_detail.html", gin.H{
+			"error": "Torneo no encontrado",
+		})
+		return
+	}
+
+	formattedPrize := utils.FormatNumber(int64(tournament.Prize))
+	tournamentFormatted := TournamentWithFormattedPrize{
+		Tournament:     tournament,
+		FormattedPrize: formattedPrize,
+	}
+
+	userID, exists := utils.GetUserIDFromCookie(c)
+
+	isRegistered := false
+	if exists {
+		for _, t := range tournament.Teams {
+			if t.Team.UserID == userID {
+				isRegistered = true
+				break
+			}
+		}
+	}
+
+	isAdmin := false
+	role, _ := utils.GetUserRoleFromCookie(c)
+	if role == "ADMIN" {
+		isAdmin = true
+	}
+
+	utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
+		"tournament":   tournamentFormatted,
+		"isRegistered": isRegistered,
+		"isAdmin":      isAdmin,
+	})
+
 }

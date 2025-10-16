@@ -111,7 +111,7 @@ func ListPlayers(c *gin.Context) {
 		"status": http.StatusOK,
 	})
 
-	c.HTML(http.StatusOK, "players.html", gin.H{
+	utils.RenderTemplate(c, http.StatusOK, "players.html", gin.H{
 		"Players":   playersFormatted,
 		"Positions": models.GetAvailablePositions(),
 	})

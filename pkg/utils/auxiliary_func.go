@@ -10,6 +10,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type Claims struct {
+	UserID uint   `json:"user_id"`
+	Role   string `json:"role"`
+	jwt.RegisteredClaims
+}
+
 // Función para verificar la autenticación del usuario y renderizar la vista
 func RenderTemplate(c *gin.Context, status int, templateName string, data gin.H) {
 	token, err := c.Cookie("jwt")
@@ -79,4 +85,46 @@ func FormatNumber(n int64) string {
 		}
 	}
 	return formatted
+}
+
+func GetUserIDFromCookie(c *gin.Context) (uint, bool) {
+	tokenString, err := c.Cookie("jwt")
+	if err != nil {
+		return 0, false
+	}
+
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+
+	if err != nil || !token.Valid {
+		return 0, false
+	}
+
+	if claims, ok := token.Claims.(*Claims); ok {
+		return claims.UserID, true
+	}
+
+	return 0, false
+}
+
+func GetUserRoleFromCookie(c *gin.Context) (string, bool) {
+	tokenString, err := c.Cookie("jwt")
+	if err != nil {
+		return "", false
+	}
+
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+
+	if err != nil || !token.Valid {
+		return "", false
+	}
+
+	if claims, ok := token.Claims.(*Claims); ok {
+		return claims.Role, true
+	}
+
+	return "", false
 }
