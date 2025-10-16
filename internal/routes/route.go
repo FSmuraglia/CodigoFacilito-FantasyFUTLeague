@@ -33,6 +33,7 @@ func RegisterRoutes(r *gin.Engine) {
 		authOnly.GET("/tournaments", controllers.ListTournaments)
 		authOnly.GET("/teams", controllers.ListTeams)
 		authOnly.GET("/players", controllers.ListPlayers)
+		authOnly.POST("/players/:id/buy", controllers.BuyPlayer)
 	}
 
 	// Rutas solo ADMIN
@@ -44,14 +45,4 @@ func RegisterRoutes(r *gin.Engine) {
 		adminOnly.GET("/players/create", controllers.CreatePlayerForm)
 		adminOnly.POST("/players/create", controllers.CreatePlayer)
 	}
-
-	// Listado de torneos
-	r.GET("/tournaments", controllers.ListTournaments)
-
-	// Listado de equipos
-	r.GET("/teams", controllers.ListTeams)
-
-	// Listado de jugadores
-	r.GET("/players", controllers.ListPlayers)
-
 }
