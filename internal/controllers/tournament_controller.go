@@ -26,10 +26,11 @@ func CreateTournamentForm(c *gin.Context) {
 
 func CreateTournament(c *gin.Context) {
 	var input struct {
-		Name      string  `form:"name" binding:"required"`
-		Prize     float64 `form:"prize" binding:"required"`
-		StartDate string  `form:"start_date" binding:"required"`
-		EndDate   string  `form:"end_date"`
+		Name       string  `form:"name" binding:"required"`
+		Prize      float64 `form:"prize" binding:"required"`
+		StartDate  string  `form:"start_date" binding:"required"`
+		EndDate    string  `form:"end_date"`
+		TeamAmount int     `form:"team_amount" binding:"required,oneof=2 4"`
 	}
 
 	if err := c.ShouldBind(&input); err != nil {
@@ -64,9 +65,10 @@ func CreateTournament(c *gin.Context) {
 	}
 
 	tournament := models.Tournament{
-		Name:      input.Name,
-		Prize:     input.Prize,
-		StartDate: startDate,
+		Name:       input.Name,
+		Prize:      input.Prize,
+		StartDate:  startDate,
+		TeamAmount: input.TeamAmount,
 	}
 
 	if endDate != nil {

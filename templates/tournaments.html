@@ -74,6 +74,7 @@
                     <th>Nombre</th>
                     <th>Premio</th>
                     <th>Fecha de Inicio</th>
+                    <th>Cantidad de Equipos</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -82,6 +83,7 @@
                     <td class="fw-semibold">{{ .Name }}</td>
                     <td>€{{ .FormattedPrize }}</td>
                     <td>{{ .StartDate.Format "02/01/2006" }}</td>
+                    <td>{{ .TeamAmount }}</td>
                 </tr>
                 {{ else }}
                 <tr>
