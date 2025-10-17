@@ -11,8 +11,8 @@ const (
 )
 
 type Match struct {
-	ID               uint `gorm:"primarykey"`
-	TournamentID     uint
+	ID               uint       `gorm:"primarykey"`
+	TournamentID     uint       `gorm:"not null"`
 	Tournament       Tournament `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	TeamAID          uint
 	TeamA            Team `gorm:"foreignKey:TeamAID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
@@ -20,8 +20,10 @@ type Match struct {
 	TeamB            Team      `gorm:"foreignKey:TeamBID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Date             time.Time `gorm:"type:date;not null"`
 	Status           Status    `gorm:"type:varchar(20);default:'NOT STARTED'"`
-	TeamAGoals       int       `gorm:"default:0;not null"`
-	TeamBGoals       int       `gorm:"default:0;not null"`
-	TeamAYellowCards int       `gorm:"default:0;not null"`
-	TeamBYellowCards int       `gorm:"default:0;not null"`
+	WinnerID         *uint
+	Winner           *Team `gorm:"foreignKey:WinnerID"`
+	TeamAGoals       int   `gorm:"default:0;not null"`
+	TeamBGoals       int   `gorm:"default:0;not null"`
+	TeamAYellowCards int   `gorm:"default:0;not null"`
+	TeamBYellowCards int   `gorm:"default:0;not null"`
 }

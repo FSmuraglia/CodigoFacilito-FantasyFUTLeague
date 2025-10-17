@@ -34,6 +34,7 @@ func RegisterRoutes(r *gin.Engine) {
 		authOnly.GET("/teams", controllers.ListTeams)
 		authOnly.GET("/players", controllers.ListPlayers)
 		authOnly.POST("/players/:id/buy", controllers.BuyPlayer)
+		authOnly.GET("/matches", controllers.ListMatches)
 	}
 
 	// Rutas solo ADMIN

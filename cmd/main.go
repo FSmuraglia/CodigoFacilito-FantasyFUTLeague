@@ -39,6 +39,10 @@ func main() {
 	playerService := services.NewPlayerService(playerRepository)
 	controllers.InitPlayerController(playerService)
 
+	matchRepository := repositories.NewMatchRepository()
+	matchService := services.NewMatchService(matchRepository)
+	controllers.InitMatchController(matchService)
+
 	r := gin.Default()
 
 	r.Static("/static", "./static")
