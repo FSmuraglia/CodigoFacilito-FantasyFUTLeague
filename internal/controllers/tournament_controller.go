@@ -198,7 +198,7 @@ func GetTournamentDetail(c *gin.Context) {
 
 func JoinTournament(c *gin.Context) {
 
-	userID, _ := utils.GetUserRoleFromCookie(c)
+	userID, _ := utils.GetUserIDFromCookie(c)
 
 	tournamentIDParam := c.Param("id")
 	tournamentID, err := strconv.ParseUint(tournamentIDParam, 10, 64)

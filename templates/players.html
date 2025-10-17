@@ -101,6 +101,7 @@
           <td>{{ .Nationality }}</td>
           <td>€{{ .FormattedValue }}</td>
           <td>{{ .Position }}</td>
+          <td></td>
           <td>
             {{ if not .TeamID }}
               <form method="POST" action="/players/{{ .ID }}/buy">

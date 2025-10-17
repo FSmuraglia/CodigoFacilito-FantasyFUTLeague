@@ -75,6 +75,7 @@
                     <th>Premio</th>
                     <th>Fecha de Inicio</th>
                     <th>Cantidad de Equipos</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -84,6 +85,11 @@
                     <td>€{{ .FormattedPrize }}</td>
                     <td>{{ .StartDate.Format "02/01/2006" }}</td>
                     <td>{{ .TeamAmount }}</td>
+                    <td> 
+                        <form method="GET" action="/tournaments/{{ .ID }}">
+                            <button class="btn btn-primary btn-sm">Ver Detalles</button>
+                        </form>        
+                    </td>
                 </tr>
                 {{ else }}
                 <tr>
