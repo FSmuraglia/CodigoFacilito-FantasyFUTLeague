@@ -2,8 +2,12 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
+	"time"
 
+	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
 	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/models"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/services"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -41,5 +45,75 @@ func ListMatches(c *gin.Context) {
 		"Sort":    sort,
 		"Status":  status,
 	})
+}
+
+func CreateMatchForm(c *gin.Context) {
+	log.LogInfo("📝 Acceso a formulario de registro de partido", nil)
+	var tournaments []models.Tournament
+
+	// Obtener torneos
+	if err := database.DB.
+		Preload("Teams").
+		Find(&tournaments).Error; err != nil {
+		log.LogError("❌ Error al obtener los torneos", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusInternalServerError,
+		})
+		c.HTML(http.StatusInternalServerError, "create_match.html", gin.H{
+			"error": "Error al cargar los torneos",
+		})
+		return
+	}
+
+	utils.RenderTemplate(c, http.StatusOK, "create_match.html", gin.H{
+		"Tournaments": tournaments,
+	})
+
+}
+
+func CreateMatch(c *gin.Context) {
+	tournamentIDStr := c.PostForm("tournament_id")
+	teamAIDStr := c.PostForm("team_a_id")
+	teamBIDStr := c.PostForm("team_b_id")
+	date := c.PostForm("date")
+
+	tournamentID, _ := strconv.ParseUint(tournamentIDStr, 10, 64)
+	teamAID, _ := strconv.ParseUint(teamAIDStr, 10, 64)
+	teamBID, _ := strconv.ParseUint(teamBIDStr, 10, 64)
+
+	if teamAID == teamBID {
+		log.LogError("❌ El Admin intentó crear un partido entre un equipo y él mismo", nil)
+		c.HTML(http.StatusBadRequest, "create_match.html", gin.H{
+			"error": "Los equipos no pueden ser iguales",
+		})
+		return
+	}
+
+	parsedDate, _ := time.Parse("2006-01-02", date)
+
+	match := models.Match{
+		TournamentID: uint(tournamentID),
+		TeamAID:      uint(teamAID),
+		TeamBID:      uint(teamBID),
+		Date:         parsedDate,
+	}
+
+	if err := database.DB.Create(&match).Error; err != nil {
+		log.LogError("❌ Error al crear el partido", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusInternalServerError,
+		})
+		c.HTML(http.StatusInternalServerError, "create_match.html", gin.H{
+			"error": "Error al crear el partido",
+		})
+		return
+	}
+
+	log.LogInfo("✅ Partido creado correctamente", map[string]interface{}{
+		"match_id": match.ID,
+		"status":   http.StatusOK,
+	})
+
+	c.Redirect(http.StatusSeeOther, "/matches")
 
 }

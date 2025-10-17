@@ -251,3 +251,30 @@ func JoinTournament(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/tournaments/%d", tournamentID))
 
 }
+
+func GetTeamsByTournament(c *gin.Context) {
+	id := c.Param("id")
+	var tournament models.Tournament
+
+	if err := database.DB.Preload("Teams.Team").First(&tournament, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Torneo no encontrado",
+		})
+		return
+	}
+
+	var teams []gin.H
+	for _, tt := range tournament.Teams {
+		teams = append(teams, gin.H{
+			"ID":   tt.Team.ID,
+			"Name": tt.Team.Name,
+		})
+	}
+
+	log.LogInfo("✅ Equipos obtenidos correctamente del torneo", map[string]interface{}{
+		"tournament_id": id,
+	})
+
+	c.JSON(http.StatusOK, teams)
+
+}

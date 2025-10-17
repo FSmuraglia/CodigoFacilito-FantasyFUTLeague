@@ -83,7 +83,13 @@
             <td>{{ .TeamA.Name }}</td>
             <td>{{ .TeamB.Name }}</td>
             <td>{{ .Status }}</td>
-            <td>{{ .TeamAGoals }} - {{ .TeamBGoals }}</td>
+            <td>
+              {{ if eq .Status "NOT STARTED" }}
+                A determinar
+              {{ else }}
+                {{ .TeamAGoals }} - {{ .TeamBGoals }}
+              {{ end }}
+            </td>
           </tr>
         {{ else }}
           <tr><td colspan="6">No hay partidos registrados</td></tr>
