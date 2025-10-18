@@ -40,10 +40,17 @@ func ListMatches(c *gin.Context) {
 		"status": http.StatusOK,
 	})
 
+	isAdmin := false
+	role, _ := utils.GetUserRoleFromCookie(c)
+	if role == "ADMIN" {
+		isAdmin = true
+	}
+
 	utils.RenderTemplate(c, http.StatusOK, "matches.html", gin.H{
 		"matches": matches,
 		"Sort":    sort,
 		"Status":  status,
+		"isAdmin": isAdmin,
 	})
 }
 

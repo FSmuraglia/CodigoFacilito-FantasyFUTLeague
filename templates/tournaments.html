@@ -67,6 +67,9 @@
             </select>
 
             <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
+            {{ if .isAdmin }}
+                <a class="btn btn-secondary mb-2 mx-2" href="/tournaments/create" role="button">Crear Torneo</a>
+            {{ end }}
         </form>
 
         <!-- Lista de torneos -->

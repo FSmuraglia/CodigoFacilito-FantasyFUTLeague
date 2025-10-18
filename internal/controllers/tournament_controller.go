@@ -128,6 +128,12 @@ func ListTournaments(c *gin.Context) {
 		})
 	}
 
+	isAdmin := false
+	role, _ := utils.GetUserRoleFromCookie(c)
+	if role == "ADMIN" {
+		isAdmin = true
+	}
+
 	log.LogInfo("✅ Torneos obtenidos correctamente de la DB", map[string]interface{}{
 		"count":  len(tournaments),
 		"status": http.StatusOK,
@@ -136,6 +142,7 @@ func ListTournaments(c *gin.Context) {
 		"tournaments": tournamentsFormatted,
 		"NameFilter":  nameFilter,
 		"SortParam":   sortParam,
+		"isAdmin":     isAdmin,
 	})
 }
 
@@ -269,6 +276,11 @@ func GetTeamsByTournament(c *gin.Context) {
 			"ID":   tt.Team.ID,
 			"Name": tt.Team.Name,
 		})
+	}
+
+	if len(teams) == 0 {
+		c.JSON(http.StatusOK, []models.Team{})
+		return
 	}
 
 	log.LogInfo("✅ Equipos obtenidos correctamente del torneo", map[string]interface{}{

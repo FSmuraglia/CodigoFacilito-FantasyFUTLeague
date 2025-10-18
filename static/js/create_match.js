@@ -14,11 +14,13 @@ document.getElementById("tournament").addEventListener("change", async function(
   const res = await fetch(`/tournaments/${tournamentId}/teams`);
   const teams = await res.json();
 
-  if (teams.length === 0) {
-    teamASelect.innerHTML = '<option>No hay equipos disponibles</option>';
-    teamBSelect.innerHTML = '<option>No hay equipos disponibles</option>';
-    return;
-  }
+  if (!Array.isArray(teams) || teams.length === 0) {
+      teamASelect.innerHTML = '<option>No hay equipos disponibles</option>';
+      teamBSelect.innerHTML = '<option>No hay equipos disponibles</option>';
+      teamASelect.disabled = true;
+      teamBSelect.disabled = true;
+      return;
+    }
 
   const options = teams.map(t => `<option value="${t.ID}">${t.Name}</option>`).join("");
   teamASelect.innerHTML = options;
