@@ -65,7 +65,7 @@
     </form>
 
     <table class="table table-striped text-center">
-      <thead>
+      <thead class="table-primary">
         <tr>
           <th>Fecha</th>
           <th>Torneo</th>
@@ -73,6 +73,7 @@
           <th>Equipo B</th>
           <th>Estado</th>
           <th>Resultado</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -89,6 +90,11 @@
               {{ else }}
                 {{ .TeamAGoals }} - {{ .TeamBGoals }}
               {{ end }}
+            </td>
+            <td>
+              <form method="GET" action="/matches/{{ .ID }}">
+                <button class="btn btn-primary btn-sm">Ver Detalles</button>
+              </form>
             </td>
           </tr>
         {{ else }}

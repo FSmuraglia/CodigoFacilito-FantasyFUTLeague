@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Partido</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark px-4">
+    <a class="navbar-brand fw-bold" href="/">FantasyFUTLeague</a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/tournaments">Torneos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/teams">Equipos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/players">Jugadores</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/matches">Partidos</a>
+        </li>
+      </ul>
+
+      <!-- Enlaces según sesión -->
+      <ul class="navbar-nav ms-auto">
+        {{ if .IsLoggedIn }}
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="/profile">Perfil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="/logout">Cerrar sesión</a>
+          </li>
+        {{ else }}
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Iniciar sesión</a>
+          </li>
+        {{ end }}
+      </ul>
+    </div>
+  </nav>
+  <div class="container py-5">
+    <h2 class="text-center mb-4">Torneo: {{ .match.Tournament.Name }}</h2>
+    <p class="text-center text-muted">Fecha: {{ .match.Date.Format "02/01/2006 15:04" }}</p>
+
+    <div class="row text-center align-items-start mt-5">
+      <!-- Equipo A -->
+      <div class="col-md-5">
+        <img src="{{ .match.TeamA.BadgeUrl }}" alt="Escudo {{ .match.TeamA.Name }}" style="width:80px;height:80px;">
+        <h4 class="mt-2">{{ .match.TeamA.Name }}</h4>
+        <ul class="list-group mt-3">
+          {{ range .match.TeamA.Players }}
+          <li class="list-group-item">{{ .Name }}</li>
+          {{ else }}
+          <li class="list-group-item text-muted">Sin jugadores</li>
+          {{ end }}
+        </ul>
+      </div>
+
+      <!-- VS -->
+      <div class="col-md-2 d-flex align-items-center justify-content-center">
+        <h3 class="fw-bold text-primary">VS</h3>
+      </div>
+
+      <!-- Equipo B -->
+      <div class="col-md-5">
+        <img src="{{ .match.TeamB.BadgeUrl }}" alt="Escudo {{ .match.TeamB.Name }}" style="width:80px;height:80px;">
+        <h4 class="mt-2">{{ .match.TeamB.Name }}</h4>
+        <ul class="list-group mt-3">
+          {{ range .match.TeamB.Players }}
+          <li class="list-group-item">{{ .Name }}</li>
+          {{ else }}
+          <li class="list-group-item text-muted">Sin jugadores</li>
+          {{ end }}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Botón para ADMIN -->
+    {{ if .isAdmin }}
+    <div class="text-center mt-5">
+      <form method="POST" action="/matches/{{ .match.ID }}/simulate">
+        <button class="btn btn-primary btn-lg">Simular Partido</button>
+      </form>
+    </div>
+    {{ end }}
+  </div>
+</body>
+</html>

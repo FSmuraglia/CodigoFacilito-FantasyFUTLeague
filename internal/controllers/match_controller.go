@@ -117,3 +117,35 @@ func CreateMatch(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/matches")
 
 }
+
+func GetMatchDetail(c *gin.Context) {
+	id := c.Param("id")
+	var match models.Match
+
+	if err := database.DB.
+		Preload("Tournament").
+		Preload("TeamA.Players").
+		Preload("TeamB.Players").
+		First(&match, id).Error; err != nil {
+		log.LogError("❌ Partido no encontrado", map[string]interface{}{
+			"error":  err.Error(),
+			"id":     id,
+			"status": http.StatusNotFound,
+		})
+		c.HTML(http.StatusNotFound, "match_detail.html", gin.H{
+			"error": "Partido no encontrado",
+		})
+		return
+	}
+
+	isAdmin := false
+	role, _ := utils.GetUserRoleFromCookie(c)
+	if role == "ADMIN" {
+		isAdmin = true
+	}
+
+	utils.RenderTemplate(c, http.StatusOK, "match_detail.html", gin.H{
+		"match":   match,
+		"isAdmin": isAdmin,
+	})
+}
