@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"text/template"
 	"time"
 
 	database "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/config"
@@ -44,6 +45,10 @@ func main() {
 	controllers.InitMatchController(matchService)
 
 	r := gin.Default()
+
+	r.SetFuncMap(template.FuncMap{
+		"add": func(a, b int) int { return a + b },
+	})
 
 	r.Static("/static", "./static")
 

@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -147,9 +148,24 @@ func ListTournaments(c *gin.Context) {
 }
 
 func GetTournamentDetail(c *gin.Context) {
+
+	// Struct para armar la tabla de posiciones en torneos de 4 equipos
+	type TeamStats struct {
+		TeamName     string
+		BadgeURL     string
+		Wins         int
+		Losses       int
+		GoalsFor     int
+		YellowCards  int
+		GoalsAgainst int
+		GoalDiff     int
+		Points       int
+	}
+
 	id := c.Param("id")
 	var tournament models.Tournament
 
+	// Obtener el torneo
 	if err := database.DB.
 		Preload("Teams.Team").
 		Preload("Winner").
@@ -165,12 +181,14 @@ func GetTournamentDetail(c *gin.Context) {
 		return
 	}
 
+	// Formatear el Prize
 	formattedPrize := utils.FormatNumber(int64(tournament.Prize))
 	tournamentFormatted := TournamentWithFormattedPrize{
 		Tournament:     tournament,
 		FormattedPrize: formattedPrize,
 	}
 
+	// Obtener el usuario y verificar si está registrado en el torneo
 	userID, exists := utils.GetUserIDFromCookie(c)
 
 	isRegistered := false
@@ -183,24 +201,81 @@ func GetTournamentDetail(c *gin.Context) {
 		}
 	}
 
-	isAdmin := false
-	role, _ := utils.GetUserRoleFromCookie(c)
-	if role == "ADMIN" {
-		isAdmin = true
-	}
-
+	// Obtener la cantidad de equipos inscriptos para verificar si está lleno o no el torneo
 	var teamCount int64
 	database.DB.Model(&models.TournamentTeam{}).Where("tournament_id = ?", tournament.ID).Count(&teamCount)
 
 	isFull := int(teamCount) >= tournament.TeamAmount
 
-	utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
-		"tournament":   tournamentFormatted,
-		"isRegistered": isRegistered,
-		"isAdmin":      isAdmin,
-		"isFull":       isFull,
-	})
+	if tournament.TeamAmount == 4 {
+		var matches []models.Match
+		if err := database.DB.Where("tournament_id = ? AND status = ?", tournament.ID, "FINISHED").Find(&matches).Error; err != nil {
+			log.LogError("❌ Error al obtener los partidos del torneo", map[string]interface{}{
+				"status": http.StatusInternalServerError,
+				"error":  err.Error(),
+			})
+			c.HTML(http.StatusInternalServerError, "tournament_detail.html", gin.H{
+				"error": "Error al obtener los partidos del torneo",
+			})
+			return
+		}
 
+		statsMap := make(map[uint]*TeamStats)
+
+		for _, tt := range tournament.Teams {
+			statsMap[tt.Team.ID] = &TeamStats{
+				TeamName: tt.Team.Name,
+				BadgeURL: tt.Team.BadgeUrl,
+			}
+		}
+
+		for _, m := range matches {
+			teamA := statsMap[m.TeamAID]
+			teamB := statsMap[m.TeamBID]
+
+			teamA.GoalsFor += m.TeamAGoals
+			teamA.GoalsAgainst += m.TeamBGoals
+			teamB.GoalsFor += m.TeamBGoals
+			teamB.GoalsAgainst += m.TeamAGoals
+
+			if m.TeamAGoals > m.TeamBGoals {
+				teamA.Wins++
+				teamB.Losses++
+				teamA.Points += 3
+			} else {
+				teamB.Wins++
+				teamA.Losses++
+				teamB.Points += 3
+			}
+		}
+
+		// Calcular diferencia de gol
+		var standings []TeamStats
+		for _, s := range statsMap {
+			s.GoalDiff = s.GoalsFor - s.GoalsAgainst
+			standings = append(standings, *s)
+		}
+
+		// Orden por puntos
+		sort.Slice(standings, func(i, j int) bool {
+			if standings[i].Points == standings[j].Points {
+				return standings[i].GoalDiff > standings[j].GoalDiff
+			}
+			return standings[i].Points > standings[j].Points
+		})
+		utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
+			"tournament":   tournamentFormatted,
+			"isRegistered": isRegistered,
+			"isFull":       isFull,
+			"standings":    standings,
+		})
+	} else {
+		utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
+			"tournament":   tournamentFormatted,
+			"isRegistered": isRegistered,
+			"isFull":       isFull,
+		})
+	}
 }
 
 func JoinTournament(c *gin.Context) {
