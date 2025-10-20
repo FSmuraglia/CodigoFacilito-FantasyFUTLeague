@@ -75,8 +75,8 @@ func SimulateMatch(teamARating, teamBRating float64) MatchResult {
 	random := rand.Float64()
 
 	// Generación aleatoria de goles
-	goalsA := rand.Intn(4)
-	goalsB := rand.Intn(4)
+	goalsA := rand.Intn(3)
+	goalsB := rand.Intn(3)
 
 	// Ajuste de los goles según el ganador
 	if random < probA {

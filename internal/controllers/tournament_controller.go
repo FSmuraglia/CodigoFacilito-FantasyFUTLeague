@@ -156,7 +156,6 @@ func GetTournamentDetail(c *gin.Context) {
 		Wins         int
 		Losses       int
 		GoalsFor     int
-		YellowCards  int
 		GoalsAgainst int
 		GoalDiff     int
 		Points       int

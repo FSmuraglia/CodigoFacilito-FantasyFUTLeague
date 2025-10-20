@@ -10,42 +10,48 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark px-4">
     <a class="navbar-brand fw-bold" href="/">FantasyFUTLeague</a>
-
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="/tournaments">Torneos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/teams">Equipos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/players">Jugadores</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/matches">Partidos</a>
-        </li>
-      </ul>
-
-      <!-- Enlaces según sesión -->
-      <ul class="navbar-nav ms-auto">
-        {{ if .IsLoggedIn }}
+          {{ if .IsLoggedIn }}
+          <li class="nav-item">
+            <a class="nav-link" href="/tournaments">Torneos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/teams">Equipos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/players">Jugadores</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/matches">Partidos</a>
+          </li>
+        </ul>
+        <!-- Enlaces según sesión -->
+        <ul class="navbar-nav ms-auto">
           <li class="nav-item">
             <a class="nav-link text-danger" href="/profile">Perfil</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-danger" href="/logout">Cerrar sesión</a>
           </li>
-        {{ else }}
+      {{ else }}
           <li class="nav-item">
             <a class="nav-link" href="/login">Iniciar sesión</a>
           </li>
-        {{ end }}
-      </ul>
+          <li class="nav-item">
+            <a class="nav-link" href="/register">Registrarse</a>
+          </li>
+      {{ end }}
+          </ul>
     </div>
   </nav>
   <div class="container py-5">
     <h2 class="text-center mb-4">Torneo: {{ .match.Tournament.Name }}</h2>
+    {{ if eq .match.Status "FINISHED" }}
+      <h3 class="text-center mb-2">Resultado: {{ .match.TeamAGoals }} - {{ .match.TeamBGoals }}</h3>
+    {{ else }}
+      <h3 class="text-center mb-2">Resultado: A determinar</h3>
+    {{ end }}
     <p class="text-center text-muted">Fecha: {{ .match.Date.Format "02/01/2006" }}</p>
 
     <div class="row text-center align-items-start mt-5">

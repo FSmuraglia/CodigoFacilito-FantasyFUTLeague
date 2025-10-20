@@ -17,9 +17,7 @@ import (
 
 func Index(c *gin.Context) {
 	log.LogInfo("🔍 Acceso a Index", nil)
-	c.HTML(http.StatusOK, "index.html", gin.H{
-		"status": "OK",
-	})
+	utils.RenderTemplate(c, http.StatusOK, "index.html", nil)
 }
 
 func RegisterForm(c *gin.Context) {
