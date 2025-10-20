@@ -16,6 +16,12 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+type MatchResult struct {
+	Winner string
+	GoalsA int
+	GoalsB int
+}
+
 // Función para verificar la autenticación del usuario y renderizar la vista
 func RenderTemplate(c *gin.Context, status int, templateName string, data gin.H) {
 	token, err := c.Cookie("jwt")
@@ -63,14 +69,27 @@ func GetUserIDFromJWT(c *gin.Context) (uint, bool) {
 
 }
 
-func SimulateMatch(teamARating, teamBRating float64) string {
-	probTeamA := teamARating / (teamARating + teamBRating)
+func SimulateMatch(teamARating, teamBRating float64) MatchResult {
+	// Probabilidad de ganar para el equipo A
+	probA := teamARating / (teamARating + teamBRating)
 	random := rand.Float64()
 
-	if random < probTeamA {
-		return "A"
+	// Generación aleatoria de goles
+	goalsA := rand.Intn(4)
+	goalsB := rand.Intn(4)
+
+	// Ajuste de los goles según el ganador
+	if random < probA {
+		if goalsA <= goalsB {
+			goalsA = goalsB + rand.Intn(2) + 1
+		}
+		return MatchResult{"A", goalsA, goalsB}
+	} else {
+		if goalsB <= goalsA {
+			goalsB = goalsA + rand.Intn(2) + 1
+		}
+		return MatchResult{"B", goalsA, goalsB}
 	}
-	return "B"
 }
 
 func FormatNumber(n int64) string {

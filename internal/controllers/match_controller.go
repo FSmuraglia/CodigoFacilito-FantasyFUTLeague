@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -155,4 +156,78 @@ func GetMatchDetail(c *gin.Context) {
 		"match":   match,
 		"isAdmin": isAdmin,
 	})
+}
+
+func SimulateMatchController(c *gin.Context) {
+	id := c.Param("id")
+
+	// Obtener partido
+	var match models.Match
+	if err := database.DB.Preload("Tournament").First(&match, id).Error; err != nil {
+		log.LogError("❌ Partido no encontrado", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusNotFound,
+		})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Partido no encontrado",
+		})
+		return
+	}
+
+	if match.Status == "FINISHED" {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "El partido ya fue simulado anteriormente",
+		})
+		return
+	}
+
+	// Obtener ratings de los equipos y simular
+	ratingA := match.TeamA.CalculateRating()
+	ratingB := match.TeamB.CalculateRating()
+
+	result := utils.SimulateMatch(ratingA, ratingB)
+
+	// Actualizar partido
+	match.TeamAGoals = result.GoalsA
+	match.TeamBGoals = result.GoalsB
+	match.Status = "FINISHED"
+
+	if result.Winner == "A" {
+		match.WinnerID = &match.TeamAID
+	} else {
+		match.WinnerID = &match.TeamBID
+	}
+
+	// Guardar cambios
+	if err := database.DB.Save(&match).Error; err != nil {
+		log.LogError("❌ Error al actualizar el partido simulado", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusInternalServerError,
+		})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Error al actualizar el partido simulado",
+		})
+		return
+	}
+
+	// Si el torneo del partido simulado era de 2 equipos, actualizar el ganador del torneo
+	if match.Tournament.TeamAmount == 2 {
+		match.Tournament.WinnerID = match.WinnerID
+		if err := database.DB.Save(&match.Tournament).Error; err != nil {
+			log.LogError("❌ Error al actualizar el torneo simulado", map[string]interface{}{
+				"error":  err.Error(),
+				"status": http.StatusInternalServerError,
+			})
+		}
+	}
+
+	log.LogInfo("✅ Partido simulado correctamente", map[string]interface{}{
+		"match_id":   match.ID,
+		"tournament": match.Tournament.Name,
+		"result":     fmt.Sprintf("%d-%d", match.TeamAGoals, match.TeamBGoals),
+		"status":     http.StatusSeeOther,
+	})
+
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/matches/%d", match.ID))
+
 }
