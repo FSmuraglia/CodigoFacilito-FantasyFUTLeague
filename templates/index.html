@@ -75,7 +75,7 @@
           <h5>{{ .LastFullTeam.Name }}</h5>
           <p>Usuario: {{ .LastFullTeam.User.Username }}</p>
           <p>Formación: {{ .LastFullTeam.Formation }}</p>
-          <p>Valor total: €{{ .FormattedTotalMarketValue }}</p>
+          <p>Valor total: €{{ .LastFullTeamFormattedTotalMarketValue }}</p>
         </div>
       </div>
     </div>
@@ -94,6 +94,7 @@
           <h5>{{ .MostWinningTeam.Name }}</h5>
           <p>Usuario: {{ .MostWinningTeam.User.Username }}</p>
           <p>Formación: {{ .MostWinningTeam.Formation }}</p>
+          <p>Valor total: €{{ .MostWinningTeamFormattedTotalMarketValue }}</p>
         </div>
       </div>
     </div>

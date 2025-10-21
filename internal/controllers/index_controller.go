@@ -13,20 +13,27 @@ func ShowIndex(c *gin.Context) {
 
 	lastFullTeam, _ := teamService.GetLastCompleteTeam()
 
-	var formattedTotalMarketValue string
+	var lastFullTeamFormattedTotalMarketValue string
 	if lastFullTeam != nil {
-		formattedTotalMarketValue = lastFullTeam.GetFormattedTotalMarketValue()
+		lastFullTeamFormattedTotalMarketValue = lastFullTeam.GetFormattedTotalMarketValue()
 	}
 
 	mostWinningTeam, _ := teamService.GetMostWinningTeam()
+
+	var mostWinningTeamFormattedTotalMarketValue string
+	if mostWinningTeam != nil {
+		mostWinningTeamFormattedTotalMarketValue = mostWinningTeam.GetFormattedTotalMarketValue()
+	}
+
 	upcomingMatches, _ := matchService.GetUpcomingMatches(3)
 
 	utils.RenderTemplate(c, http.StatusOK, "index.html", gin.H{
-		"ActiveTournaments":         activeTournaments,
-		"TotalTeams":                totalTeams,
-		"LastFullTeam":              lastFullTeam,
-		"MostWinningTeam":           mostWinningTeam,
-		"UpcomingMatches":           upcomingMatches,
-		"FormattedTotalMarketValue": formattedTotalMarketValue,
+		"ActiveTournaments":                        activeTournaments,
+		"TotalTeams":                               totalTeams,
+		"LastFullTeam":                             lastFullTeam,
+		"MostWinningTeam":                          mostWinningTeam,
+		"UpcomingMatches":                          upcomingMatches,
+		"LastFullTeamFormattedTotalMarketValue":    lastFullTeamFormattedTotalMarketValue,
+		"MostWinningTeamFormattedTotalMarketValue": mostWinningTeamFormattedTotalMarketValue,
 	})
 }

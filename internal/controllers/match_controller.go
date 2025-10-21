@@ -163,7 +163,7 @@ func SimulateMatchController(c *gin.Context) {
 
 	// Obtener partido
 	var match models.Match
-	if err := database.DB.Preload("Tournament").First(&match, id).Error; err != nil {
+	if err := database.DB.Preload("Tournament").Preload("TeamA.User").Preload("TeamB.User").First(&match, id).Error; err != nil {
 		log.LogError("❌ Partido no encontrado", map[string]interface{}{
 			"error":  err.Error(),
 			"status": http.StatusNotFound,
@@ -192,10 +192,13 @@ func SimulateMatchController(c *gin.Context) {
 	match.TeamBGoals = result.GoalsB
 	match.Status = "FINISHED"
 
+	var winnerTeam models.Team
 	if result.Winner == "A" {
 		match.WinnerID = &match.TeamAID
+		winnerTeam = match.TeamA
 	} else {
 		match.WinnerID = &match.TeamBID
+		winnerTeam = match.TeamB
 	}
 
 	// Guardar cambios
@@ -219,6 +222,18 @@ func SimulateMatchController(c *gin.Context) {
 				"status": http.StatusInternalServerError,
 			})
 		}
+
+		// Sumar el premio al presupuesto del equipo ganador
+		winnerUser := winnerTeam.User
+		winnerUser.Budget += match.Tournament.Prize
+
+		if err := database.DB.Save(&winnerUser).Error; err != nil {
+			log.LogError("❌ Error al actualizar el presupuesto del usuario ganador", map[string]interface{}{
+				"user_id": winnerUser.ID,
+				"error":   err.Error(),
+			})
+		}
+
 	}
 
 	log.LogInfo("✅ Partido simulado correctamente", map[string]interface{}{
