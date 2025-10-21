@@ -16,3 +16,7 @@ func NewTournamentService(repo repositories.TournamentRepository) *TournamentSer
 func (s *TournamentService) ListTournaments(nameFilter, sortParam string) ([]models.Tournament, error) {
 	return s.repo.GetAll(nameFilter, sortParam)
 }
+
+func (s *TournamentService) GetActiveTournaments() (int64, error) {
+	return s.repo.GetActiveTournamentsCount()
+}

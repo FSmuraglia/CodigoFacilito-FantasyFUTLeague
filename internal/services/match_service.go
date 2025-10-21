@@ -16,3 +16,7 @@ func NewMatchService(repo repositories.MatchRepository) *MatchService {
 func (s *MatchService) ListMatches(sort string, status string) ([]models.Match, error) {
 	return s.repo.GetAll(sort, status)
 }
+
+func (s *MatchService) GetUpcomingMatches(limit int) ([]models.Match, error) {
+	return s.repo.FindUpcomingMatches(limit)
+}

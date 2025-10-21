@@ -8,6 +8,7 @@ import (
 
 type MatchRepository interface {
 	GetAll(sort string, status string) ([]models.Match, error)
+	FindUpcomingMatches(limit int) ([]models.Match, error)
 }
 
 type matchRepository struct {
@@ -36,4 +37,14 @@ func (r *matchRepository) GetAll(sort string, status string) ([]models.Match, er
 	err := query.Find(&matches).Error
 	return matches, err
 
+}
+
+func (r *matchRepository) FindUpcomingMatches(limit int) ([]models.Match, error) {
+	var matches []models.Match
+	err := r.db.Preload("TeamA").Preload("TeamB").Preload("Tournament").
+		Where("status = ?", "NOT STARTED").
+		Order("date ASC").
+		Limit(limit).
+		Find(&matches).Error
+	return matches, err
 }

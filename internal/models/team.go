@@ -1,5 +1,7 @@
 package models
 
+import "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
+
 type Formation string
 
 const (
@@ -30,4 +32,12 @@ func (t *Team) CalculateRating() float64 {
 		total += player.Rating
 	}
 	return total / float64(len(t.Players))
+}
+
+func (t *Team) GetFormattedTotalMarketValue() string {
+	var total float64
+	for _, player := range t.Players {
+		total += player.MarketValue
+	}
+	return utils.FormatNumber(int64(total))
 }

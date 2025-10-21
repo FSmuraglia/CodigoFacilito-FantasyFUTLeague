@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
-    <title>Document</title>
+    <title>FantasyFUTLeague</title>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark px-4">
@@ -45,7 +45,84 @@
           </ul>
     </div>
   </nav>
-  <h2>Hola</h2>
+  <div class="container mt-5 text-center">
+    <h1 class="mb-4">⚽ Bienvenido a FantasyFutLeague</h1>
+    <p>Creá tu equipo, competí en torneos y convertite en el mejor manager.</p>
+
+    <div class="row mt-5">
+      <div class="col-md-6">
+        <div class="card shadow-sm p-3">
+          <h4>Torneos activos</h4>
+          <p class="display-5">{{ .ActiveTournaments }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm p-3">
+          <h4>Equipos registrados</h4>
+          <p class="display-5">{{ .TotalTeams }}</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-5">
+
+    <h3>⚽ Último equipo completo creado</h3>
+    {{ if .LastFullTeam }}
+    <div class="card p-4 mt-3 text-start mx-auto" style="max-width: 600px;">
+      <div class="d-flex align-items-center">
+        <img src="{{ .LastFullTeam.BadgeUrl }}" alt="Escudo" class="me-3" style="width:60px;height:60px;">
+        <div>
+          <h5>{{ .LastFullTeam.Name }}</h5>
+          <p>Usuario: {{ .LastFullTeam.User.Username }}</p>
+          <p>Formación: {{ .LastFullTeam.Formation }}</p>
+          <p>Valor total: €{{ .FormattedTotalMarketValue }}</p>
+        </div>
+      </div>
+    </div>
+    {{ else }}
+    <p>No hay equipos completos aún.</p>
+    {{ end }}
+
+    <hr class="my-5">
+
+    <h3>🏆 Equipo más ganador</h3>
+    {{ if .MostWinningTeam }}
+    <div class="card p-4 mt-3 text-start mx-auto" style="max-width: 600px;">
+      <div class="d-flex align-items-center">
+        <img src="{{ .MostWinningTeam.BadgeUrl }}" alt="Escudo" class="me-3" style="width:60px;height:60px;">
+        <div>
+          <h5>{{ .MostWinningTeam.Name }}</h5>
+          <p>Usuario: {{ .MostWinningTeam.User.Username }}</p>
+          <p>Formación: {{ .MostWinningTeam.Formation }}</p>
+        </div>
+      </div>
+    </div>
+    {{ else }}
+    <p>Todavía no hay campeones registrados.</p>
+    {{ end }}
+
+    <hr class="my-5">
+
+    <h3>📅 Próximos partidos</h3>
+    {{ if .UpcomingMatches }}
+    <ul class="list-group mx-auto" style="max-width: 600px;">
+      {{ range .UpcomingMatches }}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ .TeamA.Name }} vs {{ .TeamB.Name }}</span>
+        <span>{{ .Tournament.Name }}</span>
+        <span>{{ .Date.Format "02/01/2006" }}</span>
+      </li>
+      {{ end }}
+    </ul>
+    {{ else }}
+    <p>No hay partidos programados próximamente.</p>
+    {{ end }}
+  </div>
+  <footer class="mt-auto py-3 text-center">
+    <div class="container">
+      <span>© 2025 <strong>FantasyFUT League</strong> — Proyecto académico desarrollado en Go ⚽</span>
+    </div>
+  </footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

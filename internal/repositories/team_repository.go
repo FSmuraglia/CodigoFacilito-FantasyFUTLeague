@@ -8,6 +8,9 @@ import (
 
 type TeamRepository interface {
 	GetAll(nameFilter string, formationFilter string) ([]models.Team, error)
+	GetTotalTeamsCount() (int64, error)
+	FindLastCompleteTeam() (*models.Team, error)
+	FindMostWinningTeam() (*models.Team, error)
 }
 
 type teamRepository struct {
@@ -31,4 +34,31 @@ func (r *teamRepository) GetAll(nameFilter string, formationFilter string) ([]mo
 
 	err := db.Find(&teams).Error
 	return teams, err
+}
+
+func (r *teamRepository) GetTotalTeamsCount() (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Team{}).Count(&count).Error
+	return count, err
+}
+
+func (r *teamRepository) FindLastCompleteTeam() (*models.Team, error) {
+	var team models.Team
+	err := r.db.Preload("Players").Preload("User").
+		Joins("JOIN players ON players.team_id = teams.id").
+		Group("teams.id").
+		Having("COUNT(players.id) = 11").
+		Order("teams.id DESC").
+		First(&team).Error
+	return &team, err
+}
+
+func (r *teamRepository) FindMostWinningTeam() (*models.Team, error) {
+	var team models.Team
+	err := r.db.Preload("Players").Preload("User").
+		Joins("JOIN tournaments ON tournaments.winner_id = teams.id").
+		Group("teams.id").
+		Order("COUNT(tournaments.id) DESC").
+		First(&team).Error
+	return &team, err
 }

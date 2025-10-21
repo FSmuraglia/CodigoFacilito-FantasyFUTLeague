@@ -1,11 +1,11 @@
-/* ===== Estilo general ===== */
+/*Estilo general*/
 body {
     background-color: #ffffff; /* Fondo blanco */
     color: #1a1a1a; /* Texto gris oscuro para buena lectura */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ===== Navbar ===== */
+/*Navbar*/
 nav.navbar {
     background-color: #0d6efd; /* Azul principal */
 }
@@ -21,7 +21,7 @@ a.navbar-brand:hover {
     color: #dbe8ff !important; /* Azul muy claro al pasar el mouse */
 }
 
-/* ===== Tarjetas ===== */
+/*Tarjetas*/
 .card {
     background-color: #f8f9fa; /* Gris claro */
     color: #212529; /* Texto casi negro */
@@ -29,7 +29,7 @@ a.navbar-brand:hover {
     border-radius: 8px;
 }
 
-/* ===== Botones ===== */
+/*Botones*/
 .btn-primary {
     background-color: #0d6efd;
     border: none;
@@ -39,7 +39,7 @@ a.navbar-brand:hover {
     background-color: #0b5ed7;
 }
 
-/* ===== Formularios ===== */
+/*Formularios*/
 .form-control {
     border: 1px solid #ced4da;
     border-radius: 6px;
@@ -50,7 +50,7 @@ a.navbar-brand:hover {
     box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
 }
 
-/* ===== Enlaces ===== */
+/*Enlaces*/
 a {
     color: #0d6efd;
     text-decoration: none;
@@ -61,7 +61,7 @@ a:hover {
     text-decoration: underline;
 }
 
-/* ===== Utilidades ===== */
+/*Utilidades*/
 .text-center {
     text-align: center;
 }

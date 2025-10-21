@@ -8,7 +8,7 @@ import (
 
 func RegisterRoutes(r *gin.Engine) {
 	// Página principal
-	r.GET("/", controllers.Index)
+	r.GET("/", controllers.ShowIndex)
 
 	// Register
 	r.GET("/register", controllers.RegisterForm)
