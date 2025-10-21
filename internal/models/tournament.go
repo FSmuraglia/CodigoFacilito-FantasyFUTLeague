@@ -2,6 +2,18 @@ package models
 
 import "time"
 
+type TeamStats struct {
+	TeamID         uint
+	TeamName       string
+	BadgeURL       string
+	GoalsFor       int
+	GoalsAgainst   int
+	GoalDifference int
+	Wins           int
+	Losses         int
+	Points         int
+}
+
 type Tournament struct {
 	ID         uint `gorm:"primarykey"`
 	Teams      []TournamentTeam

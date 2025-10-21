@@ -14,6 +14,7 @@ import (
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/services"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 var tournamentService *services.TournamentService
@@ -200,6 +201,12 @@ func GetTournamentDetail(c *gin.Context) {
 		}
 	}
 
+	isAdmin := false
+	role, _ := utils.GetUserRoleFromCookie(c)
+	if role == "ADMIN" {
+		isAdmin = true
+	}
+
 	// Obtener la cantidad de equipos inscriptos para verificar si está lleno o no el torneo
 	var teamCount int64
 	database.DB.Model(&models.TournamentTeam{}).Where("tournament_id = ?", tournament.ID).Count(&teamCount)
@@ -267,12 +274,14 @@ func GetTournamentDetail(c *gin.Context) {
 			"isRegistered": isRegistered,
 			"isFull":       isFull,
 			"standings":    standings,
+			"isAdmin":      isAdmin,
 		})
 	} else {
 		utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
 			"tournament":   tournamentFormatted,
 			"isRegistered": isRegistered,
 			"isFull":       isFull,
+			"isAdmin":      isAdmin,
 		})
 	}
 }
@@ -363,4 +372,108 @@ func GetTeamsByTournament(c *gin.Context) {
 
 	c.JSON(http.StatusOK, teams)
 
+}
+
+func FinishTournament(c *gin.Context) {
+	id := c.Param("id")
+
+	var tournament models.Tournament
+	if err := database.DB.
+		Preload("Teams.Team").
+		Preload("Winner").
+		First(&tournament, id).Error; err != nil {
+		log.LogError("❌ Torneo no encontrado", nil)
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Torneo no encontrado",
+		})
+		return
+	}
+
+	// Chequear que le torneo no tenga un campeón ya
+	if tournament.TeamAmount != 4 || tournament.WinnerID != nil {
+		log.LogError("❌ El torneo no puede finalizarse, tiene campeón", nil)
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Este torneo no puede finalizarse",
+		})
+		return
+	}
+
+	// Obtener partidos finalizados para chequear que se hayan jugado los 12 partidos
+	var matches []models.Match
+	if err := database.DB.Where("tournament_id = ? AND status = ?", tournament.ID, "FINISHED").Find(&matches).Error; err != nil {
+		log.LogError("❌ Error al obtener los partidos del torneo", map[string]interface{}{
+			"error":         err.Error(),
+			"status":        http.StatusInternalServerError,
+			"tournament_id": tournament.ID,
+		})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Error al obtener los partidos del torneo",
+		})
+		return
+	}
+
+	if len(matches) < 2 {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "No se han jugado todos los partidos del torneo",
+		})
+		return
+	}
+
+	table, err := tournamentService.CalculateTournamentTable(tournament.ID)
+	if err != nil {
+		log.LogError("❌ Error al calcular la tabla del torneo", map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
+
+	if len(table) == 0 {
+		log.LogError("❌ No hay suficientes datos para finalizar el torneo", nil)
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "No hay suficientes datos para finalizar el torneo",
+		})
+		return
+	}
+
+	championID := table[0].TeamID
+
+	// Actualizar el ganador del torneo
+	if err := database.DB.Model(&models.Tournament{}).
+		Where("id = ?", tournament.ID).
+		Update("winner_id", championID).Error; err != nil {
+		log.LogError("❌ Error al actualizar el ganador del torneo", map[string]interface{}{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "Error al actualizar el torneo"})
+		return
+	}
+
+	// Asignar premio
+	var winningTeam models.Team
+	if err := database.DB.Select("id", "user_id").First(&winningTeam, championID).Error; err != nil {
+		log.LogError("❌ Error al obtener el equipo ganador", map[string]interface{}{"error": err.Error()})
+	} else {
+		if err := database.DB.Model(&models.User{}).
+			Where("id = ?", winningTeam.UserID).
+			UpdateColumn("budget", gorm.Expr("budget + ?", tournament.Prize)).Error; err != nil {
+			log.LogError("❌ Error al actualizar el presupuesto del usuario ganador", map[string]interface{}{
+				"user_id": winningTeam.UserID,
+				"error":   err.Error(),
+			})
+		} else {
+			log.LogInfo("✅ Presupuesto asignado al ganador del torneo", map[string]interface{}{
+				"tournament_id": tournament.ID,
+				"winning_team":  winningTeam.ID,
+				"prize":         tournament.Prize,
+			})
+		}
+
+		log.LogInfo("✅ Torneo finalizado correctamente", map[string]interface{}{
+			"tournament_id": tournament.ID,
+			"winner":        winningTeam.Name,
+			"status":        http.StatusSeeOther,
+		})
+
+		tournament.Teams = nil
+
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/tournaments/%d", tournament.ID))
+
+	}
 }

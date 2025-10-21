@@ -138,6 +138,13 @@
           {{ end }}
         </div>
       {{ end }}
+      {{ if and (eq .tournament.TeamAmount 4) (not .tournament.Winner.Name) .isAdmin }}
+        <div class="text-center mt-4">
+          <form method="POST" action="/tournaments/{{ .tournament.ID }}/finish">
+            <button class="btn btn-success">Finalizar Torneo</button>
+          </form>
+        </div>
+      {{ end }}
     </div>
 
     <!-- Botones -->

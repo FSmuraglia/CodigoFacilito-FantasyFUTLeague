@@ -44,6 +44,7 @@ func RegisterRoutes(r *gin.Engine) {
 	{
 		adminOnly.GET("/tournaments/create", controllers.CreateTournamentForm)
 		adminOnly.POST("/tournaments/create", controllers.CreateTournament)
+		adminOnly.POST("/tournaments/:id/finish", controllers.FinishTournament)
 		adminOnly.GET("/players/create", controllers.CreatePlayerForm)
 		adminOnly.POST("/players/create", controllers.CreatePlayer)
 		adminOnly.GET("/matches/create", controllers.CreateMatchForm)

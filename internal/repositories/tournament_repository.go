@@ -9,6 +9,7 @@ import (
 type TournamentRepository interface {
 	GetAll(nameFilter string, sortParam string) ([]models.Tournament, error)
 	GetActiveTournamentsCount() (int64, error)
+	GetTournamentWithTeamsAndMatches(tournamentID uint) (models.Tournament, []models.Match, error)
 }
 
 type tournamentRepository struct {
@@ -46,4 +47,18 @@ func (r *tournamentRepository) GetActiveTournamentsCount() (int64, error) {
 	var count int64
 	err := r.db.Model(&models.Tournament{}).Where("winner_id IS NULL").Count(&count).Error
 	return count, err
+}
+
+func (r *tournamentRepository) GetTournamentWithTeamsAndMatches(tournamentID uint) (models.Tournament, []models.Match, error) {
+	var tournament models.Tournament
+	if err := r.db.Preload("Teams.Team").First(&tournament, tournamentID).Error; err != nil {
+		return tournament, nil, err
+	}
+
+	var matches []models.Match
+	if err := r.db.Where("tournament_id = ?", tournamentID).Find(&matches).Error; err != nil {
+		return tournament, nil, err
+	}
+
+	return tournament, matches, nil
 }
