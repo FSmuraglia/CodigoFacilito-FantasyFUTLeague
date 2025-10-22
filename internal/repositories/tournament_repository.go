@@ -10,6 +10,7 @@ type TournamentRepository interface {
 	GetAll(nameFilter string, sortParam string) ([]models.Tournament, error)
 	GetActiveTournamentsCount() (int64, error)
 	GetTournamentWithTeamsAndMatches(tournamentID uint) (models.Tournament, []models.Match, error)
+	GetTournamentsCountWonByTeamID(teamID uint) (int64, error)
 }
 
 type tournamentRepository struct {
@@ -61,4 +62,10 @@ func (r *tournamentRepository) GetTournamentWithTeamsAndMatches(tournamentID uin
 	}
 
 	return tournament, matches, nil
+}
+
+func (r *tournamentRepository) GetTournamentsCountWonByTeamID(teamID uint) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Tournament{}).Where("winner_id = ?", teamID).Count(&count).Error
+	return count, err
 }

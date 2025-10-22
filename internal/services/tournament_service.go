@@ -23,6 +23,10 @@ func (s *TournamentService) GetActiveTournaments() (int64, error) {
 	return s.repo.GetActiveTournamentsCount()
 }
 
+func (s *TournamentService) GetTournamentsWonByTeamID(teamID uint) (int64, error) {
+	return s.repo.GetTournamentsCountWonByTeamID(teamID)
+}
+
 func (s *TournamentService) CalculateTournamentTable(tournamentID uint) ([]models.TeamStats, error) {
 	tournament, matches, err := s.repo.GetTournamentWithTeamsAndMatches(tournamentID)
 	if err != nil {

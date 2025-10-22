@@ -163,7 +163,7 @@ func SimulateMatchController(c *gin.Context) {
 
 	// Obtener partido
 	var match models.Match
-	if err := database.DB.Preload("Tournament").Preload("TeamA.User").Preload("TeamB.User").First(&match, id).Error; err != nil {
+	if err := database.DB.Preload("Tournament").Preload("TeamA.User").Preload("TeamB.User").Preload("TeamA.Players").Preload("TeamB.Players").First(&match, id).Error; err != nil {
 		log.LogError("❌ Partido no encontrado", map[string]interface{}{
 			"error":  err.Error(),
 			"status": http.StatusNotFound,

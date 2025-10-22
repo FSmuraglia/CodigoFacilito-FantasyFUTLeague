@@ -11,6 +11,7 @@ type TeamRepository interface {
 	GetTotalTeamsCount() (int64, error)
 	FindLastCompleteTeam() (*models.Team, error)
 	FindMostWinningTeam() (*models.Team, error)
+	GetByUserID(userID uint) (*models.Team, error)
 }
 
 type teamRepository struct {
@@ -60,5 +61,11 @@ func (r *teamRepository) FindMostWinningTeam() (*models.Team, error) {
 		Group("teams.id").
 		Order("COUNT(tournaments.id) DESC").
 		First(&team).Error
+	return &team, err
+}
+
+func (r *teamRepository) GetByUserID(userID uint) (*models.Team, error) {
+	var team models.Team
+	err := r.db.Preload("Players").Where("user_id = ?", userID).First(&team).Error
 	return &team, err
 }

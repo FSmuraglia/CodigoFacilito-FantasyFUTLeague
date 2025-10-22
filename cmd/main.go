@@ -44,6 +44,10 @@ func main() {
 	matchService := services.NewMatchService(matchRepository)
 	controllers.InitMatchController(matchService)
 
+	userRepository := repositories.NewUserRepository()
+	userService := services.NewUserService(userRepository)
+	controllers.InitProfileController(userService)
+
 	r := gin.Default()
 
 	r.SetFuncMap(template.FuncMap{

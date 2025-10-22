@@ -20,3 +20,7 @@ func (s *MatchService) ListMatches(sort string, status string) ([]models.Match, 
 func (s *MatchService) GetUpcomingMatches(limit int) ([]models.Match, error) {
 	return s.repo.FindUpcomingMatches(limit)
 }
+
+func (s *MatchService) GetTeamStats(teamID uint) (repositories.TeamStatsProfile, error) {
+	return s.repo.CalculateTeamStats(teamID)
+}

@@ -31,7 +31,7 @@ func (t *Team) CalculateRating() float64 {
 	for _, player := range t.Players {
 		total += player.Rating
 	}
-	return total / float64(len(t.Players))
+	return total / 11
 }
 
 func (t *Team) GetFormattedTotalMarketValue() string {

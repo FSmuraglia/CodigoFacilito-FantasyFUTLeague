@@ -28,3 +28,7 @@ func (s *TeamService) GetLastCompleteTeam() (*models.Team, error) {
 func (s *TeamService) GetMostWinningTeam() (*models.Team, error) {
 	return s.repo.FindMostWinningTeam()
 }
+
+func (s *TeamService) GetTeamByUserID(userID uint) (*models.Team, error) {
+	return s.repo.GetByUserID(userID)
+}

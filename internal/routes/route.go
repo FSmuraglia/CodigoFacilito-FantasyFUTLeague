@@ -25,7 +25,7 @@ func RegisterRoutes(r *gin.Engine) {
 	authOnly := r.Group("/")
 	authOnly.Use(middlewares.AuthRequired())
 	{
-		authOnly.GET("/profile", controllers.Profile)
+		authOnly.GET("/profile", controllers.GetProfile)
 		authOnly.GET("/teams", controllers.ListTeams)
 		authOnly.GET("/teams/create", controllers.CreateTeamForm)
 		authOnly.POST("/teams/create", controllers.CreateTeam)
