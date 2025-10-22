@@ -18,7 +18,7 @@ func ShowIndex(c *gin.Context) {
 		lastFullTeamFormattedTotalMarketValue = lastFullTeam.GetFormattedTotalMarketValue()
 	}
 
-	mostWinningTeam, _ := teamService.GetMostWinningTeam()
+	mostWinningTeam, wins, _ := teamService.GetMostWinningTeam()
 
 	var mostWinningTeamFormattedTotalMarketValue string
 	if mostWinningTeam != nil {
@@ -32,6 +32,7 @@ func ShowIndex(c *gin.Context) {
 		"TotalTeams":                               totalTeams,
 		"LastFullTeam":                             lastFullTeam,
 		"MostWinningTeam":                          mostWinningTeam,
+		"MostWinningTeamWins":                      wins,
 		"UpcomingMatches":                          upcomingMatches,
 		"LastFullTeamFormattedTotalMarketValue":    lastFullTeamFormattedTotalMarketValue,
 		"MostWinningTeamFormattedTotalMarketValue": mostWinningTeamFormattedTotalMarketValue,

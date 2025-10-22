@@ -25,7 +25,7 @@ func (s *TeamService) GetLastCompleteTeam() (*models.Team, error) {
 	return s.repo.FindLastCompleteTeam()
 }
 
-func (s *TeamService) GetMostWinningTeam() (*models.Team, error) {
+func (s *TeamService) GetMostWinningTeam() (*models.Team, int64, error) {
 	return s.repo.FindMostWinningTeam()
 }
 

@@ -10,7 +10,7 @@ type TeamRepository interface {
 	GetAll(nameFilter string, formationFilter string) ([]models.Team, error)
 	GetTotalTeamsCount() (int64, error)
 	FindLastCompleteTeam() (*models.Team, error)
-	FindMostWinningTeam() (*models.Team, error)
+	FindMostWinningTeam() (*models.Team, int64, error)
 	GetByUserID(userID uint) (*models.Team, error)
 }
 
@@ -54,14 +54,38 @@ func (r *teamRepository) FindLastCompleteTeam() (*models.Team, error) {
 	return &team, err
 }
 
-func (r *teamRepository) FindMostWinningTeam() (*models.Team, error) {
-	var team models.Team
-	err := r.db.Preload("Players").Preload("User").
+func (r *teamRepository) FindMostWinningTeam() (*models.Team, int64, error) {
+	// Struct para incluir los torneos ganados
+	type TeamWinCount struct {
+		ID   uint
+		Wins int64
+	}
+
+	// Conseguir la cantidad de torneos ganados del equipo en la query
+	var result TeamWinCount
+	err := r.db.
+		Table("teams").
+		Select("teams.id, COUNT(tournaments.id) AS wins").
 		Joins("JOIN tournaments ON tournaments.winner_id = teams.id").
 		Group("teams.id").
-		Order("COUNT(tournaments.id) DESC").
-		First(&team).Error
-	return &team, err
+		Order("wins DESC").
+		Limit(1).
+		Scan(&result).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Conseguir los datos del equipo más ganador, para luego incluir en el index
+	var team models.Team
+	err = r.db.
+		Preload("Players").
+		Preload("User").
+		First(&team, result.ID).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return &team, result.Wins, nil
 }
 
 func (r *teamRepository) GetByUserID(userID uint) (*models.Team, error) {
