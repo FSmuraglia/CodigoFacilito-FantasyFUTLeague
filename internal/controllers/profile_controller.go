@@ -3,6 +3,8 @@ package controllers
 import (
 	"net/http"
 
+	log "github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/logger"
+	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/repositories"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/internal/services"
 	"github.com/FSmuraglia/CodigoFacilito-FantasyFUTLeague/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -21,13 +23,30 @@ func GetProfile(c *gin.Context) {
 		return
 	}
 
+	isAdmin := false
+	role, _ := utils.GetUserRoleFromCookie(c)
+	if role == "ADMIN" {
+		isAdmin = true
+	}
+
 	user := userService.GetUser(userID)
 	formattedBudget := utils.FormatNumber(int64(user.Budget))
 
-	team, _ := teamService.GetTeamByUserID(userID)
+	team, err := teamService.GetTeamByUserID(userID)
+	if err != nil {
+		log.LogError("❌ Error al obtener el equipo del usuario", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusInternalServerError,
+		})
+	}
 
-	stats, _ := matchService.GetTeamStats(team.ID)
-	tournamentsWon, _ := tournamentService.GetTournamentsWonByTeamID(team.ID)
+	var stats repositories.TeamStatsProfile
+	var tournamentsWon int64
+
+	if team != nil {
+		stats, _ = matchService.GetTeamStats(team.ID)
+		tournamentsWon, _ = tournamentService.GetTournamentsWonByTeamID(team.ID)
+	}
 
 	utils.RenderTemplate(c, http.StatusOK, "profile.html", gin.H{
 		"user":            user,
@@ -35,6 +54,7 @@ func GetProfile(c *gin.Context) {
 		"stats":           stats,
 		"tournamentsWon":  tournamentsWon,
 		"formattedBudget": formattedBudget,
+		"isAdmin":         isAdmin,
 	})
 
 }

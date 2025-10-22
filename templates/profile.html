@@ -47,57 +47,69 @@
   </nav>
 
   <div class="container mt-4">
-    <h2 class="text-center mb-4">Perfil de {{ .user.Username }}</h2>
 
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5>Información Personal</h5>
-        <p><strong>Correo:</strong> {{ .user.Email }}</p>
-        <p><strong>Presupuesto:</strong> ${{ .formattedBudget }}</p>
+    {{ if .isAdmin }}
+      <h2 class="text-center mb-4">Perfil del Usuario Administrador: {{ .user.Username }}</h2>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>Información Personal</h5>
+          <p><strong>Correo:</strong> {{ .user.Email }}</p>
+        </div>
       </div>
-    </div>
+    {{ else }}
+      <h2 class="text-center mb-4">Perfil de {{ .user.Username }}</h2>
+      
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>Información Personal</h5>
+          <p><strong>Correo:</strong> {{ .user.Email }}</p>
+          <p><strong>Presupuesto:</strong> ${{ .formattedBudget }}</p>
+        </div>
+      </div>
+    {{ end }}
 
     {{ if .team }}
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5>Tu Equipo: {{ .team.Name }}</h5>
-        <img src="{{ .team.BadgeUrl }}" alt="Escudo" class="img-fluid mb-3" style="max-width: 120px;">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Jugador</th>
-              <th>Posición</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{ range .team.Players }}
-            <tr>
-              <td>{{ .Name }}</td>
-              <td>{{ .Position }}</td>
-            </tr>
-            {{ end }}
-          </tbody>
-        </table>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>Tu Equipo: {{ .team.Name }}</h5>
+          <img src="{{ .team.BadgeUrl }}" alt="Escudo" class="img-fluid mb-3" style="max-width: 120px;">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Jugador</th>
+                <th>Posición</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{ range .team.Players }}
+              <tr>
+                <td>{{ .Name }}</td>
+                <td>{{ .Position }}</td>
+              </tr>
+              {{ end }}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5>Estadísticas</h5>
-        <p><strong>Partidos jugados:</strong> {{ .stats.MatchesPlayed }}</p>
-        <p><strong>Partidos ganados:</strong> {{ .stats.MatchesWon }}</p>
-        <p><strong>Porcentaje de Victoria:</strong> %{{ printf "%.1f" .stats.WinRate }}</p>
-        <p><strong>Goles a favor:</strong> {{ .stats.GoalsFor }}</p>
-        <p><strong>Goles en contra:</strong> {{ .stats.GoalsAgainst }}</p>
-        <p><strong>Torneos ganados:</strong> {{ .tournamentsWon }}</p>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>Estadísticas</h5>
+          <p><strong>Partidos jugados:</strong> {{ .stats.MatchesPlayed }}</p>
+          <p><strong>Partidos ganados:</strong> {{ .stats.MatchesWon }}</p>
+          <p><strong>Porcentaje de Victoria:</strong> %{{ printf "%.1f" .stats.WinRate }}</p>
+          <p><strong>Goles a favor:</strong> {{ .stats.GoalsFor }}</p>
+          <p><strong>Goles en contra:</strong> {{ .stats.GoalsAgainst }}</p>
+          <p><strong>Torneos ganados:</strong> {{ .tournamentsWon }}</p>
+        </div>
       </div>
-    </div>
 
-    {{ else }}
-    <div class="alert alert-info text-center">
-      Aún no tenés un equipo creado.<br>
-      <a href="/teams/create" class="btn btn-primary mt-2">Crear mi equipo</a>
-    </div>
+    {{ else if and (not .team) (not .isAdmin)}}
+      <div class="alert alert-info text-center">
+        Aún no tenés un equipo creado.<br>
+        <a href="/teams/create" class="btn btn-primary mt-2">Crear mi equipo</a>
+      </div>
     {{ end }}
   </div>
 

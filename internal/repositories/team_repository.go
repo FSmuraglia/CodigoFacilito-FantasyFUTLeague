@@ -91,5 +91,12 @@ func (r *teamRepository) FindMostWinningTeam() (*models.Team, int64, error) {
 func (r *teamRepository) GetByUserID(userID uint) (*models.Team, error) {
 	var team models.Team
 	err := r.db.Preload("Players").Where("user_id = ?", userID).First(&team).Error
-	return &team, err
+	// Chequeo para devolver nil si el usuario no tiene equipo, o devolver error si realmente hubo un error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &team, nil
 }
