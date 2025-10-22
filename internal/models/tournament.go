@@ -25,4 +25,5 @@ type Tournament struct {
 	WinnerID   *uint
 	Winner     Team    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Matches    []Match `gorm:"foreignKey:TournamentID"`
+	Status     Status  `gorm:"type:varchar(20);default:'NOT STARTED'"`
 }

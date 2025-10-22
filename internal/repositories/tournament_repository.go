@@ -7,7 +7,7 @@ import (
 )
 
 type TournamentRepository interface {
-	GetAll(nameFilter string, sortParam string) ([]models.Tournament, error)
+	GetAll(nameFilter string, sortParam string, status string) ([]models.Tournament, error)
 	GetActiveTournamentsCount() (int64, error)
 	GetTournamentWithTeamsAndMatches(tournamentID uint) (models.Tournament, []models.Match, error)
 	GetTournamentsCountWonByTeamID(teamID uint) (int64, error)
@@ -21,7 +21,7 @@ func NewTournamentRepository() TournamentRepository {
 	return &tournamentRepository{db: database.DB}
 }
 
-func (r *tournamentRepository) GetAll(nameFilter string, sortParam string) ([]models.Tournament, error) {
+func (r *tournamentRepository) GetAll(nameFilter string, sortParam string, status string) ([]models.Tournament, error) {
 	var tournaments []models.Tournament
 	db := r.db
 
@@ -38,6 +38,10 @@ func (r *tournamentRepository) GetAll(nameFilter string, sortParam string) ([]mo
 		db = db.Order("start_date ASC")
 	case "date_desc":
 		db = db.Order("start_date DESC")
+	}
+
+	if status != "" {
+		db = db.Where("status = ?", status)
 	}
 
 	err := db.Find(&tournaments).Error

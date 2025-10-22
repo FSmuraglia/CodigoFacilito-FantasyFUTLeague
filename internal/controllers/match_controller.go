@@ -216,6 +216,7 @@ func SimulateMatchController(c *gin.Context) {
 	// Si el torneo del partido simulado era de 2 equipos, actualizar el ganador del torneo
 	if match.Tournament.TeamAmount == 2 {
 		match.Tournament.WinnerID = match.WinnerID
+		match.Tournament.Status = "FINISHED"
 		if err := database.DB.Save(&match.Tournament).Error; err != nil {
 			log.LogError("❌ Error al actualizar el torneo simulado", map[string]interface{}{
 				"error":  err.Error(),
@@ -234,6 +235,17 @@ func SimulateMatchController(c *gin.Context) {
 			})
 		}
 
+	}
+
+	if match.Tournament.TeamAmount == 4 && match.Tournament.Status != "IN PROGRESS" {
+		if err := database.DB.Model(&models.Tournament{}).
+			Where("id = ?", match.Tournament.ID).
+			Update("status", "IN PROGRESS").Error; err != nil {
+			log.LogError("❌ Error al actualizar el estado del torneo", nil)
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"error": "Error al actualizar el estado del torneo",
+			})
+		}
 	}
 
 	log.LogInfo("✅ Partido simulado correctamente", map[string]interface{}{

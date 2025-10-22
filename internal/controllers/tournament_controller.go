@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -108,8 +107,9 @@ func CreateTournament(c *gin.Context) {
 func ListTournaments(c *gin.Context) {
 	nameFilter := strings.TrimSpace(c.Query("name"))
 	sortParam := c.Query("sort")
+	status := c.Query("status")
 
-	tournaments, err := tournamentService.ListTournaments(nameFilter, sortParam)
+	tournaments, err := tournamentService.ListTournaments(nameFilter, sortParam, status)
 	if err != nil {
 		log.LogError("❌ Error al obtener los torneos de la DB", map[string]interface{}{
 			"status": http.StatusInternalServerError,
@@ -149,18 +149,6 @@ func ListTournaments(c *gin.Context) {
 }
 
 func GetTournamentDetail(c *gin.Context) {
-
-	// Struct para armar la tabla de posiciones en torneos de 4 equipos
-	type TeamStats struct {
-		TeamName     string
-		BadgeURL     string
-		Wins         int
-		Losses       int
-		GoalsFor     int
-		GoalsAgainst int
-		GoalDiff     int
-		Points       int
-	}
 
 	id := c.Param("id")
 	var tournament models.Tournament
@@ -226,54 +214,20 @@ func GetTournamentDetail(c *gin.Context) {
 			return
 		}
 
-		statsMap := make(map[uint]*TeamStats)
+		table, err := tournamentService.CalculateTournamentTable(tournament.ID)
 
-		for _, tt := range tournament.Teams {
-			statsMap[tt.Team.ID] = &TeamStats{
-				TeamName: tt.Team.Name,
-				BadgeURL: tt.Team.BadgeUrl,
-			}
+		if err != nil {
+			log.LogError("❌ Error al obtener la tabla del torneo", nil)
+			c.HTML(http.StatusInternalServerError, "tournament_detail.html", gin.H{
+				"error": "Error al obtener la tabla del torneo",
+			})
 		}
 
-		for _, m := range matches {
-			teamA := statsMap[m.TeamAID]
-			teamB := statsMap[m.TeamBID]
-
-			teamA.GoalsFor += m.TeamAGoals
-			teamA.GoalsAgainst += m.TeamBGoals
-			teamB.GoalsFor += m.TeamBGoals
-			teamB.GoalsAgainst += m.TeamAGoals
-
-			if m.TeamAGoals > m.TeamBGoals {
-				teamA.Wins++
-				teamB.Losses++
-				teamA.Points += 3
-			} else {
-				teamB.Wins++
-				teamA.Losses++
-				teamB.Points += 3
-			}
-		}
-
-		// Calcular diferencia de gol
-		var standings []TeamStats
-		for _, s := range statsMap {
-			s.GoalDiff = s.GoalsFor - s.GoalsAgainst
-			standings = append(standings, *s)
-		}
-
-		// Orden por puntos
-		sort.Slice(standings, func(i, j int) bool {
-			if standings[i].Points == standings[j].Points {
-				return standings[i].GoalDiff > standings[j].GoalDiff
-			}
-			return standings[i].Points > standings[j].Points
-		})
 		utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
 			"tournament":   tournamentFormatted,
 			"isRegistered": isRegistered,
 			"isFull":       isFull,
-			"standings":    standings,
+			"standings":    table,
 			"isAdmin":      isAdmin,
 		})
 	} else {
@@ -436,12 +390,20 @@ func FinishTournament(c *gin.Context) {
 
 	championID := table[0].TeamID
 
-	// Actualizar el ganador del torneo
+	// Actualizar el ganador y el estado del torneo
 	if err := database.DB.Model(&models.Tournament{}).
 		Where("id = ?", tournament.ID).
-		Update("winner_id", championID).Error; err != nil {
-		log.LogError("❌ Error al actualizar el ganador del torneo", map[string]interface{}{"error": err.Error()})
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "Error al actualizar el torneo"})
+		Updates(map[string]interface{}{
+			"winner_id": championID,
+			"status":    "FINISHED",
+		}).Error; err != nil {
+		log.LogError("❌ Error al actualizar el torneo al finalizar", map[string]interface{}{
+			"error":  err.Error(),
+			"status": http.StatusInternalServerError,
+		})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Error al actualizar el torneo",
+		})
 		return
 	}
 
