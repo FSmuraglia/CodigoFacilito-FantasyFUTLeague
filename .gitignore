@@ -31,9 +31,6 @@ go.work.sum
 # log file
 app.log
 
-#local uploads
-static/uploads
-
 #project_structure file
 project_structure.txt
 

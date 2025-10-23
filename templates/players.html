@@ -49,7 +49,7 @@
     <h2 class="text-center text-primary mb-4">Jugadores Disponibles</h2>
 
     <!-- Filtros -->
-    <form method="GET" action="/players" class="row mb-4">
+    <form method="GET" action="/players" class="row mb-4 align-items-center">
       <div class="col-md-4">
         <input type="text" name="name" class="form-control" placeholder="Buscar por nombre" value="{{ .NameFilter }}">
       </div>
@@ -71,8 +71,13 @@
         </select>
       </div>
 
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+      <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-grow-1">Filtrar</button>
+
+        <!-- Mostrar solo si el usuario es admin -->
+        {{ if .isAdmin }}
+          <a href="/players/create" class="btn btn-secondary">Agregar</a>
+        {{ end }}
       </div>
     </form>
 
@@ -94,6 +99,7 @@
           <th>Nacionalidad</th>
           <th>Valor (€)</th>
           <th>Posición</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -105,7 +111,6 @@
           <td>{{ .Nationality }}</td>
           <td>€{{ .FormattedValue }}</td>
           <td>{{ .Position }}</td>
-          <td></td>
           <td>
             {{ if not .TeamID }}
               <form method="POST" action="/players/{{ .ID }}/buy">

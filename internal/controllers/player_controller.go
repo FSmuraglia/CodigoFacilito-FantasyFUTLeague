@@ -107,6 +107,12 @@ func ListPlayers(c *gin.Context) {
 		})
 	}
 
+	isAdmin := false
+	role, _ := utils.GetUserRoleFromCookie(c)
+	if role == "ADMIN" {
+		isAdmin = true
+	}
+
 	log.LogInfo("✅ Jugadores obtenidos correctamente de la DB", map[string]interface{}{
 		"count":  len(players),
 		"status": http.StatusOK,
@@ -115,6 +121,7 @@ func ListPlayers(c *gin.Context) {
 	utils.RenderTemplate(c, http.StatusOK, "players.html", gin.H{
 		"Players":   playersFormatted,
 		"Positions": models.GetAvailablePositions(),
+		"isAdmin":   isAdmin,
 	})
 }
 
