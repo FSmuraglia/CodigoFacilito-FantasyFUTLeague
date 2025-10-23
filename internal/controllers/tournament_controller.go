@@ -204,7 +204,11 @@ func GetTournamentDetail(c *gin.Context) {
 
 	if tournament.TeamAmount == 4 {
 		var matches []models.Match
-		if err := database.DB.Where("tournament_id = ? AND status = ?", tournament.ID, "FINISHED").Find(&matches).Error; err != nil {
+		if err := database.DB.
+			Preload("TeamA").
+			Preload("TeamB").
+			Where("tournament_id = ? AND status = ?", tournament.ID, "FINISHED").
+			Find(&matches).Error; err != nil {
 			log.LogError("❌ Error al obtener los partidos del torneo", map[string]interface{}{
 				"status": http.StatusInternalServerError,
 				"error":  err.Error(),
@@ -230,6 +234,7 @@ func GetTournamentDetail(c *gin.Context) {
 			"isFull":       isFull,
 			"standings":    table,
 			"isAdmin":      isAdmin,
+			"matches":      matches,
 		})
 	} else {
 		utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{

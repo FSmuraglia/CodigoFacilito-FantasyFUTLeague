@@ -136,6 +136,45 @@
               </tbody>
             </table>
           {{ end }}
+          <!-- Partidos del torneo -->
+          <div class="container mt-5">
+            <h4 class="text-center mb-3">📅 Partidos Jugados</h4>
+
+            {{ if not .matches }}
+              <p class="text-center text-muted">Todavía no hay partidos finalizados.</p>
+            {{ else }}
+              <table class="table table-striped text-center align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Equipo A</th>
+                    <th>Resultado</th>
+                    <th>Equipo B</th>
+                    <th>Ganador</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{ range .matches }}
+                    <tr>
+                      <td>{{ .Date.Format "02/01/2006" }}</td>
+                      <td>{{ .TeamA.Name }}</td>
+                      <td>{{ .TeamAGoals }} - {{ .TeamBGoals }}</td>
+                      <td>{{ .TeamB.Name }}</td>
+                      <td>
+                        {{ if gt .TeamAGoals .TeamBGoals }}
+                          {{ .TeamA.Name }}
+                        {{ else if gt .TeamBGoals .TeamAGoals }}
+                          {{ .TeamB.Name }}
+                        {{ else }}
+                          Empate
+                        {{ end }}
+                      </td>
+                    </tr>
+                  {{ end }}
+                </tbody>
+              </table>
+            {{ end }}
+          </div>
         </div>
       {{ end }}
       {{ if and (eq .tournament.TeamAmount 4) (not .tournament.Winner.Name) .isAdmin }}
