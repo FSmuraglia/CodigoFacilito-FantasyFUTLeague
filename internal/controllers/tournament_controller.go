@@ -237,6 +237,33 @@ func GetTournamentDetail(c *gin.Context) {
 			"matches":      matches,
 		})
 	} else {
+
+		// Obtener el partido del torneo para mostrar resultado en la vista
+		var match models.Match
+		var winnerName string
+		if err := database.DB.
+			Preload("TeamA").
+			Preload("TeamB").
+			Where("tournament_id = ?", tournament.ID).
+			First(&match).Error; err == nil {
+			if match.Status == "FINISHED" {
+				if *match.WinnerID == match.TeamAID {
+					winnerName = match.TeamA.Name
+				} else {
+					winnerName = match.TeamB.Name
+				}
+				utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
+					"tournament":   tournamentFormatted,
+					"isRegistered": isRegistered,
+					"isFull":       isFull,
+					"isAdmin":      isAdmin,
+					"match":        match,
+					"winnerName":   winnerName,
+				})
+				return
+			}
+		}
+
 		utils.RenderTemplate(c, http.StatusOK, "tournament_detail.html", gin.H{
 			"tournament":   tournamentFormatted,
 			"isRegistered": isRegistered,

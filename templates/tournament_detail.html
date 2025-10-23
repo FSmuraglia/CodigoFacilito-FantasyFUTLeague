@@ -78,7 +78,7 @@
       <p class="text-muted">No hay equipos inscriptos.</p>
     {{ end }}
 
-    <!-- Bracket -->
+    <!-- Cuadro del torneo o tabla de posiciones -->
     <div class="bracket my-4 p-3 border rounded bg-white">
       {{ if eq .tournament.TeamAmount 2 }}
         <h4>Cuadro del Torneo</h4>
@@ -96,6 +96,19 @@
             {{ end }}
           </div>
         </div>
+        {{ if .match }}
+          <div class="card mt-4">
+            <div class="card-body text-center">
+              <h5 class="card-title">Resultado de la Final</h5>
+              <p class="card-text">
+                <strong>{{ .match.TeamA.Name }}</strong> {{ .match.TeamAGoals }} - {{ .match.TeamBGoals }} <strong>{{ .match.TeamB.Name }}</strong>
+              </p>
+              {{ if .winnerName }}
+                <p>🏆 Ganador: <strong>{{ .winnerName }}</strong></p>
+              {{ end }}
+            </div>
+          </div>
+        {{ end }}
       {{ else if eq .tournament.TeamAmount 4 }}
         <div class="container mt-4">
           <h4 class="text-center mb-3">Tabla de Posiciones</h4>
@@ -163,10 +176,8 @@
                       <td>
                         {{ if gt .TeamAGoals .TeamBGoals }}
                           {{ .TeamA.Name }}
-                        {{ else if gt .TeamBGoals .TeamAGoals }}
-                          {{ .TeamB.Name }}
                         {{ else }}
-                          Empate
+                          {{ .TeamB.Name }}
                         {{ end }}
                       </td>
                     </tr>
