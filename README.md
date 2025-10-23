@@ -1,6 +1,5 @@
 # CodigoFacilito-FantasyFUTLeague
-### FantasyFUTLeague es una aplicación web desarrollada en Go que permite a los usuarios crear equipos de fútbol, participar en torneos y competir en un ranking general
-
+### FantasyFUTLeague es una aplicación web desarrollada en Go que permite a los usuarios crear equipos de fútbol y participar en torneos, poniendo a prueba sus conocimientos de fútbol
 #### Tecnologías Utilizadas:
 - MySQL
 - Go v1.24.5

@@ -51,8 +51,9 @@ func CreateTournament(c *gin.Context) {
 		})
 		return
 	}
+	loc, _ := time.LoadLocation("America/Argentina/Buenos_Aires")
 
-	startDate, err := time.Parse("2006-01-02", input.StartDate)
+	startDate, err := time.ParseInLocation("2006-01-02", input.StartDate, loc)
 	if err != nil {
 		log.LogWarn("⚠️ Fecha de inicio inválida", map[string]interface{}{
 			"error":  err.Error(),
@@ -66,7 +67,7 @@ func CreateTournament(c *gin.Context) {
 
 	var endDate *time.Time
 	if input.EndDate != "" {
-		parsedEndDate, err := time.Parse("2006-01-02", input.EndDate)
+		parsedEndDate, err := time.ParseInLocation("2006-01-02", input.EndDate, loc)
 		if err == nil {
 			endDate = &parsedEndDate
 		}
@@ -266,6 +267,30 @@ func JoinTournament(c *gin.Context) {
 		})
 		c.HTML(http.StatusBadRequest, "error.html", gin.H{
 			"error": "Debes crear un equipo antes de inscribirte a un torneo",
+		})
+		return
+	}
+
+	// Verificar que el equipo tenga 11 jugadores, ni más ni menos
+	var playerCount int64
+	if err := database.DB.Model(&models.Player{}).Where("team_id = ?", team.ID).Count(&playerCount).Error; err != nil {
+		log.LogError("❌ Error al contar los jugadores del equipo", map[string]interface{}{
+			"error":   err.Error(),
+			"team_id": team.ID,
+		})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Error al verificar los jugadores del equipo",
+		})
+		return
+	}
+
+	if playerCount != 11 {
+		log.LogWarn("⚠️ El equipo no tiene la cantidad correcta de jugadores", map[string]interface{}{
+			"team_id": team.ID,
+			"count":   playerCount,
+		})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": fmt.Sprintf("Tu equipo debe tener exactamente 11 jugadores para participar (actualmente tiene %d)", playerCount),
 		})
 		return
 	}
