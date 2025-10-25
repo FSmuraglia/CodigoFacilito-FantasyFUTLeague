@@ -51,9 +51,7 @@ func CreateTournament(c *gin.Context) {
 		})
 		return
 	}
-	loc, _ := time.LoadLocation("America/Argentina/Buenos_Aires")
-
-	startDate, err := time.ParseInLocation("2006-01-02", input.StartDate, loc)
+	startDate, err := time.Parse("2006-01-02", input.StartDate)
 	if err != nil {
 		log.LogWarn("⚠️ Fecha de inicio inválida", map[string]interface{}{
 			"error":  err.Error(),
@@ -67,7 +65,7 @@ func CreateTournament(c *gin.Context) {
 
 	var endDate *time.Time
 	if input.EndDate != "" {
-		parsedEndDate, err := time.ParseInLocation("2006-01-02", input.EndDate, loc)
+		parsedEndDate, err := time.Parse("2006-01-02", input.EndDate)
 		if err == nil {
 			endDate = &parsedEndDate
 		}

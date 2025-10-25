@@ -56,10 +56,19 @@ Ejecutar ese script y se cargará la base de datos con:
 
 Ejecución con Docker:
 
-***A Completar***
+Para ejecutar el proyecto localmente en Docker hay que seguir los siguientes pasos:
+- Asegurarse de tener cargadas las variables de entorno, para que el `docker-compose.yml` las reconozca correctamente
+- Ejecutar el comando:
+  - `docker compose up --build`: Para construir la imagen de la aplicación Go desde el Dockerfile, crear los contenedores de la app y de la DB, y copiar los datos iniciales de la DB que están en el script `demo_data.sql`
+- Luego estos comandos serán útiles también:
+  - `docker compose down`: Para detener los contenedores, manteniendo la DB guardada y los volúmenes
+  - `docker compose down -v`: Para detener los contenedores, borrando además los datos de la DB y los volúmenes
+  - `docker compose up`: Para volver a levantar los contenedores y poder seguir corriendo el proyecto, con los datos actualizados del último uso
+
 
 **Asegurarse de utilizar las funcionalidades del proyecto de manera acorde, para evitar crear inconsistencias en el mismo**
 
+### Para probar de forma correcta el proyecto, se recomienda leer las instrucciones de uso en el documento PDF del proyecto
 ---
 
 #### Endpoints Principales:

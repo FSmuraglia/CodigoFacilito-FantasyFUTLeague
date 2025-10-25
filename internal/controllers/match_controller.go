@@ -97,8 +97,7 @@ func CreateMatch(c *gin.Context) {
 		return
 	}
 
-	loc, _ := time.LoadLocation("America/Argentina/Buenos_Aires")
-	parsedDate, _ := time.ParseInLocation("2006-01-02", date, loc)
+	parsedDate, _ := time.Parse("2006-01-02", date)
 
 	match := models.Match{
 		TournamentID: uint(tournamentID),

@@ -16,6 +16,35 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `matches`
+--
+
+DROP TABLE IF EXISTS `matches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `matches` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tournament_id` bigint unsigned NOT NULL,
+  `team_a_id` bigint unsigned DEFAULT NULL,
+  `team_b_id` bigint unsigned DEFAULT NULL,
+  `date` date NOT NULL,
+  `status` varchar(20) DEFAULT 'NOT STARTED',
+  `winner_id` bigint unsigned DEFAULT NULL,
+  `team_a_goals` bigint NOT NULL DEFAULT '0',
+  `team_b_goals` bigint NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `fk_matches_team_a` (`team_a_id`),
+  KEY `fk_matches_team_b` (`team_b_id`),
+  KEY `fk_matches_winner` (`winner_id`),
+  KEY `fk_tournaments_matches` (`tournament_id`),
+  CONSTRAINT `fk_matches_team_a` FOREIGN KEY (`team_a_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_matches_team_b` FOREIGN KEY (`team_b_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_matches_winner` FOREIGN KEY (`winner_id`) REFERENCES `teams` (`id`),
+  CONSTRAINT `fk_tournaments_matches` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping data for table `matches`
 --
 
@@ -24,6 +53,28 @@ LOCK TABLES `matches` WRITE;
 INSERT INTO `matches` VALUES (1,1,1,2,'2025-10-23','FINISHED',2,2,3),(2,2,1,2,'2025-10-23','FINISHED',1,3,2),(3,2,1,3,'2025-10-23','FINISHED',1,2,1),(4,2,1,4,'2025-10-23','FINISHED',1,2,1),(5,2,2,3,'2025-10-23','FINISHED',3,1,3),(6,2,2,4,'2025-10-23','FINISHED',4,0,1),(7,2,3,4,'2025-10-23','FINISHED',4,0,2);
 /*!40000 ALTER TABLE `matches` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `players`
+--
+
+DROP TABLE IF EXISTS `players`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `players` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `team_id` bigint unsigned DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `nationality` varchar(100) NOT NULL,
+  `market_value` double NOT NULL,
+  `rating` double NOT NULL,
+  `photo_url` varchar(255) DEFAULT NULL,
+  `position` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_teams_players` (`team_id`),
+  CONSTRAINT `fk_teams_players` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `players`
@@ -36,6 +87,25 @@ INSERT INTO `players` VALUES (1,1,'Alisson','Brasil',22000000,7.17,'https://img.
 UNLOCK TABLES;
 
 --
+-- Table structure for table `teams`
+--
+
+DROP TABLE IF EXISTS `teams`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `teams` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `badge_url` varchar(255) DEFAULT NULL,
+  `formation` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_teams_user` (`user_id`),
+  CONSTRAINT `fk_teams_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping data for table `teams`
 --
 
@@ -44,6 +114,24 @@ LOCK TABLES `teams` WRITE;
 INSERT INTO `teams` VALUES (1,'user2team',2,'/static/uploads/20251023153229_badge1.png','433'),(2,'user3team',3,'/static/uploads/20251023153256_badge2.png','4231'),(3,'user4team',4,'/static/uploads/20251023153325_badge3.png','442'),(4,'user5team',5,'/static/uploads/20251023171207_badge4.png','433');
 /*!40000 ALTER TABLE `teams` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `tournament_teams`
+--
+
+DROP TABLE IF EXISTS `tournament_teams`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tournament_teams` (
+  `tournament_id` bigint unsigned DEFAULT NULL,
+  `team_id` bigint unsigned DEFAULT NULL,
+  `points` bigint NOT NULL DEFAULT '0',
+  KEY `fk_teams_tournaments` (`team_id`),
+  KEY `fk_tournaments_teams` (`tournament_id`),
+  CONSTRAINT `fk_teams_tournaments` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`),
+  CONSTRAINT `fk_tournaments_teams` FOREIGN KEY (`tournament_id`) REFERENCES `tournaments` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `tournament_teams`
@@ -56,6 +144,29 @@ INSERT INTO `tournament_teams` VALUES (1,1,0),(2,1,0),(1,2,0),(2,2,0),(2,3,0),(2
 UNLOCK TABLES;
 
 --
+-- Table structure for table `tournaments`
+--
+
+DROP TABLE IF EXISTS `tournaments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tournaments` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `team_amount` bigint NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `prize` double DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `winner_id` bigint unsigned DEFAULT NULL,
+  `status` varchar(20) DEFAULT 'NOT STARTED',
+  PRIMARY KEY (`id`),
+  KEY `fk_teams_won_tournaments` (`winner_id`),
+  CONSTRAINT `fk_teams_won_tournaments` FOREIGN KEY (`winner_id`) REFERENCES `teams` (`id`),
+  CONSTRAINT `chk_tournaments_team_amount` CHECK ((`team_amount` in (2,4)))
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping data for table `tournaments`
 --
 
@@ -64,6 +175,25 @@ LOCK TABLES `tournaments` WRITE;
 INSERT INTO `tournaments` VALUES (1,2,'Torneo Relámpago',10000000,'2025-10-23','2025-10-23',2,'FINISHED'),(2,4,'Liguilla Regional ',30000000,'2025-10-23','2025-10-24',1,'FINISHED'),(3,2,'Torneo Relámpago 2',10000000,'2025-10-24','2025-10-24',NULL,'NOT STARTED');
 /*!40000 ALTER TABLE `tournaments` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `budget` double DEFAULT '520000000',
+  `role` enum('USER','ADMIN') DEFAULT 'USER',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_users_email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `users`
@@ -84,4 +214,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-23 17:24:08
+-- Dump completed on 2025-10-24 22:18:39
